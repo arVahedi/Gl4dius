@@ -1,6 +1,7 @@
-package gl4di4tor.deface;
+package gl4di4tor.module.deface;
 
 import gl4di4tor.configuration.Config;
+import gl4di4tor.log.LogService;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -13,10 +14,9 @@ import java.util.Map;
 /**
  * Created by gladiator on 7/11/17.
  */
-public class DefaceFactory {
+public class DefaceAttack {
 
     private static final Map<String, String> HTTP_HEADER_MAP = new HashMap<>();
-    private static final String defacePath = "src/gl4di4tor/deface/pages/";
     private static final String HTTP_END_OF_HEADERS = "\r\n\r\n";
 
     static {
@@ -42,8 +42,9 @@ public class DefaceFactory {
         return stringBuilder.toString();
     }
 
-    public static String makeDefaceResponse() throws IOException {
-        String defacePage = DefaceFactory.readFile(defacePath + Config.getInstance().getDefacePage(),
+    public static String makeDefaceResponse() throws Exception {
+        LogService.debug("Making deface response from " + Config.getInstance().getDefacePage());
+        String defacePage = DefaceAttack.readFile(Config.getInstance().getDefacePage(),
                 StandardCharsets.UTF_8);
         return makeHttpHeaders() + defacePage.length() + HTTP_END_OF_HEADERS + defacePage;
     }

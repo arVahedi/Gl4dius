@@ -23,7 +23,16 @@ public class LogService {
         try {
             this.coloredPrinter = new ColoredPrinter.Builder(Config.getInstance().getLogLevel(), false)
                     .build();
-        } catch (IOException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private LogService(int level) {
+        try {
+            this.coloredPrinter = new ColoredPrinter.Builder(level, false)
+                    .build();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -60,6 +69,19 @@ public class LogService {
         instance.printDate(LogLevel.FATAL);
         instance.coloredPrinter.debugPrintln(message, LogLevel.FATAL.getValue(), Ansi.Attribute.BOLD, Ansi.FColor.RED, Ansi.BColor.YELLOW);
         instance.coloredPrinter.clear();
+    }
+
+    public static void fatal(Object message, boolean useConfig) {
+        if (!useConfig) {
+            ColoredPrinter coloredPrinter = new ColoredPrinter.Builder(LogLevel.FATAL.getValue(), false).build();
+            coloredPrinter.debugPrint(coloredPrinter.getDateFormatted(), Ansi.Attribute.NONE, Ansi.FColor.CYAN, Ansi.BColor.BLACK);
+            coloredPrinter.clear();
+            coloredPrinter.debugPrint(" - ");
+            coloredPrinter.debugPrintln(message, LogLevel.FATAL.getValue(), Ansi.Attribute.BOLD, Ansi.FColor.RED, Ansi.BColor.YELLOW);
+            coloredPrinter.clear();
+        } else {
+            fatal(message);
+        }
     }
 
     private void printDate(LogLevel level) {

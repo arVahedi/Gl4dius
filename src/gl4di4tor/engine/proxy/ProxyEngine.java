@@ -1,6 +1,7 @@
 package gl4di4tor.engine.proxy;
 
-import gl4di4tor.deface.DefaceFactory;
+import gl4di4tor.Router;
+import gl4di4tor.module.deface.DefaceAttack;
 import gl4di4tor.log.LogService;
 
 import java.io.DataInputStream;
@@ -27,20 +28,16 @@ public class ProxyEngine extends Thread {
 
         while (true) {
             try {
-                Socket server = serverSocket.accept();
+                Socket client = serverSocket.accept();
 
-                LogService.debug("Connection received from " + server.getRemoteSocketAddress());
-                DataInputStream in = new DataInputStream(server.getInputStream());
-                DataOutputStream out = new DataOutputStream(server.getOutputStream());
+                LogService.info("Connection received from " + client.getRemoteSocketAddress());
 
-                out.writeUTF(DefaceFactory.makeDefaceResponse());
-                out.flush();
-                server.close();
+                Router.getInstance().route(client);
 
             } catch (SocketTimeoutException s) {
                 LogService.fatal("Socket timed out!");
                 break;
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 break;
             }
