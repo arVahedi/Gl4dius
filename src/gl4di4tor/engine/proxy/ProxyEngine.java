@@ -1,6 +1,7 @@
 package gl4di4tor.engine.proxy;
 
 import gl4di4tor.deface.DefaceFactory;
+import gl4di4tor.log.LogService;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -22,13 +23,13 @@ public class ProxyEngine extends Thread {
     }
 
     public void run() {
-        System.out.println("Waiting for client on port " + serverSocket.getLocalPort() + "...");
+        LogService.info("Proxy engine started on port " + serverSocket.getLocalPort() + "");
 
         while (true) {
             try {
                 Socket server = serverSocket.accept();
 
-                System.out.println("Just connected to " + server.getRemoteSocketAddress());
+                LogService.debug("Connection received from " + server.getRemoteSocketAddress());
                 DataInputStream in = new DataInputStream(server.getInputStream());
                 DataOutputStream out = new DataOutputStream(server.getOutputStream());
 
@@ -37,7 +38,7 @@ public class ProxyEngine extends Thread {
                 server.close();
 
             } catch (SocketTimeoutException s) {
-                System.out.println("Socket timed out!");
+                LogService.fatal("Socket timed out!");
                 break;
             } catch (IOException e) {
                 e.printStackTrace();

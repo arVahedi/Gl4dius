@@ -12,6 +12,7 @@ import java.util.Properties;
 public class Config {
     private int proxyServerPort;
     private String defacePage;
+    private int logLevel;
 
     private static Config instance;
 
@@ -34,8 +35,10 @@ public class Config {
         config.load(fileReader);
         this.proxyServerPort = Integer.valueOf(config.getProperty("proxy.server.port"));
         this.defacePage = config.getProperty("deface.page");
+        this.logLevel = Integer.valueOf(config.getProperty("log.level"));
     }
 
+    //region Getter and Setter
     public int getProxyServerPort() {
         return proxyServerPort;
     }
@@ -51,4 +54,13 @@ public class Config {
     public void setDefacePage(String defacePage) {
         this.defacePage = defacePage;
     }
+
+    public int getLogLevel() {
+        return logLevel;
+    }
+
+    public void setLogLevel(int logLevel) {
+        this.logLevel = logLevel;
+    }
+    //endregion
 }
