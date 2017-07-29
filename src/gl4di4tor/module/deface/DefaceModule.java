@@ -8,6 +8,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.file.NoSuchFileException;
 
 /**
  * Created by Gladiator on 7/29/2017 AD.
@@ -28,6 +29,12 @@ public class DefaceModule extends BaseModule {
             out.writeUTF(DefaceAttack.makeDefaceResponse());
             out.flush();
             this.socket.close();
+        }catch (NoSuchFileException e) {
+            try {
+                LogService.error(Config.getInstance().getDefacePage() + " not find.");
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
         } catch (Exception e) {
             LogService.error(e);
         }
