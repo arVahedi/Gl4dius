@@ -8,7 +8,8 @@ public enum LogLevel {
     INFO(4),
     WARNING(3),
     ERROR(2),
-    FATAL(1);
+    FATAL(1),
+    PERSIST(0);
 
     private int value;
 

@@ -5,8 +5,6 @@ import com.diogonunes.jcdp.color.api.Ansi;
 import gl4di4tor.assets.LogLevel;
 import gl4di4tor.configuration.Config;
 
-import java.io.IOException;
-
 /**
  * Created by Gladiator on 7/28/2017 AD.
  */
@@ -43,31 +41,31 @@ public class LogService {
 
     public static void debug(Object message) {
         instance.printDate(LogLevel.DEBUG);
-        instance.coloredPrinter.debugPrintln(message, LogLevel.DEBUG.getValue());
+        instance.coloredPrinter.debugPrintln("[DEBUG] : " + message, LogLevel.DEBUG.getValue());
         instance.coloredPrinter.clear();
     }
 
     public static void info(Object message) {
         instance.printDate(LogLevel.INFO);
-        instance.coloredPrinter.debugPrintln(message, LogLevel.INFO.getValue(), Ansi.Attribute.BOLD, Ansi.FColor.BLUE, Ansi.BColor.NONE);
+        instance.coloredPrinter.debugPrintln("[INFO] : " + message, LogLevel.INFO.getValue(), Ansi.Attribute.BOLD, Ansi.FColor.BLUE, Ansi.BColor.NONE);
         instance.coloredPrinter.clear();
     }
 
     public static void warning(Object message) {
         instance.printDate(LogLevel.WARNING);
-        instance.coloredPrinter.debugPrintln(message, LogLevel.WARNING.getValue(), Ansi.Attribute.NONE, Ansi.FColor.YELLOW, Ansi.BColor.NONE);
+        instance.coloredPrinter.debugPrintln("[WARNING] : " + message, LogLevel.WARNING.getValue(), Ansi.Attribute.NONE, Ansi.FColor.YELLOW, Ansi.BColor.NONE);
         instance.coloredPrinter.clear();
     }
 
     public static void error(Object message) {
         instance.printDate(LogLevel.ERROR);
-        instance.coloredPrinter.debugPrintln(message, LogLevel.ERROR.getValue(), Ansi.Attribute.BOLD, Ansi.FColor.RED, Ansi.BColor.NONE);
+        instance.coloredPrinter.debugPrintln("[ERROR] : " + message, LogLevel.ERROR.getValue(), Ansi.Attribute.BOLD, Ansi.FColor.RED, Ansi.BColor.NONE);
         instance.coloredPrinter.clear();
     }
 
     public static void fatal(Object message) {
         instance.printDate(LogLevel.FATAL);
-        instance.coloredPrinter.debugPrintln(message, LogLevel.FATAL.getValue(), Ansi.Attribute.BOLD, Ansi.FColor.RED, Ansi.BColor.YELLOW);
+        instance.coloredPrinter.debugPrintln("[FATAL] : " + message, LogLevel.FATAL.getValue(), Ansi.Attribute.BOLD, Ansi.FColor.RED, Ansi.BColor.YELLOW);
         instance.coloredPrinter.clear();
     }
 
@@ -77,11 +75,24 @@ public class LogService {
             coloredPrinter.debugPrint(coloredPrinter.getDateFormatted(), Ansi.Attribute.NONE, Ansi.FColor.CYAN, Ansi.BColor.BLACK);
             coloredPrinter.clear();
             coloredPrinter.debugPrint(" - ");
-            coloredPrinter.debugPrintln(message, LogLevel.FATAL.getValue(), Ansi.Attribute.BOLD, Ansi.FColor.RED, Ansi.BColor.YELLOW);
+            coloredPrinter.debugPrintln("[FATAL] : " + message, LogLevel.FATAL.getValue(), Ansi.Attribute.BOLD, Ansi.FColor.RED, Ansi.BColor.YELLOW);
             coloredPrinter.clear();
         } else {
             fatal(message);
         }
+    }
+
+    public static void log(Object message, Ansi.FColor fColor, Ansi.BColor bColor) {
+        instance.printDate(LogLevel.PERSIST);
+        instance.coloredPrinter.debugPrintln(message, LogLevel.PERSIST.getValue(), Ansi.Attribute.BOLD, fColor, bColor);
+        instance.coloredPrinter.clear();
+    }
+
+    public static void log(Object message) {
+        instance.printDate(LogLevel.PERSIST);
+        instance.coloredPrinter.debugPrintln(message, LogLevel.PERSIST.getValue(), Ansi.Attribute.NONE, Ansi.FColor.YELLOW,
+                Ansi.BColor.NONE);
+        instance.coloredPrinter.clear();
     }
 
     private void printDate(LogLevel level) {

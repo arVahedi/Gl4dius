@@ -21,7 +21,7 @@ public class Router {
     }
 
     public void route(Socket client) throws Exception {
-        LogService.info("Routing client to " + Config.getInstance().getMode().toUpperCase() + " module");
+        LogService.debug("Routing client to " + Config.getInstance().getMode().toUpperCase() + " module");
 
         switch (AttackMode.valueOf(Config.getInstance().getMode().toUpperCase())) {
             case DEFACE:

@@ -2,6 +2,7 @@ package gl4di4tor.module.deface;
 
 import gl4di4tor.configuration.Config;
 import gl4di4tor.log.LogService;
+import gl4di4tor.utility.file.FileUtility;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -24,11 +25,6 @@ public class DefaceAttack {
 //        HTTP_HEADER_MAP.put("Strict-Transport-Security", "max-age=31536000");
     }
 
-    private static String readFile(String path, Charset encoding) throws IOException {
-        byte[] encoded = Files.readAllBytes(Paths.get(path));
-        return new String(encoded, encoding);
-    }
-
     private static String makeHttpHeaders() {
         StringBuilder stringBuilder = new StringBuilder("HTTP/1.1 200 OK\r\n");
         HTTP_HEADER_MAP.forEach((key, value) -> {
@@ -44,7 +40,7 @@ public class DefaceAttack {
 
     public static String makeDefaceResponse() throws Exception {
         LogService.debug("Making deface response from " + Config.getInstance().getDefacePage());
-        String defacePage = DefaceAttack.readFile(Config.getInstance().getDefacePage(),
+        String defacePage = FileUtility.readFile(Config.getInstance().getDefacePage(),
                 StandardCharsets.UTF_8);
         return makeHttpHeaders() + defacePage.length() + HTTP_END_OF_HEADERS + defacePage;
     }

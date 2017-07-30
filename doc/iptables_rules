@@ -1,3 +1,6 @@
+=====================
+#proxy server rule:
+=====================
 _ iptables -t nat -A PREROUTING -i enp4s0 -p tcp --dport 80 -j DNAT --to-destination 192.168.16.63:4428
 
 _ iptables -t nat -A PREROUTING -i enp4s0 -p tcp --dport 443 -j DNAT --to-destination 192.168.16.63:4428
@@ -5,3 +8,12 @@ _ iptables -t nat -A PREROUTING -i enp4s0 -p tcp --dport 443 -j DNAT --to-destin
 ------------------------------------------------------------------------------------------------------------------------
 
 _ iptables -t nat -A PREROUTING -i enp4s0 -p tcp --match multiport --dports 80,443 -j DNAT --to-destination 192.168.16.63:4428
+
+------------------------------------------------------------------------------------------------------------------------
+
+=====================
+#web server rule:
+=====================
+_ iptables -t nat -A PREROUTING -i enp4s0 -p tcp --dport 4444 -j DNAT --to-destination 192.168.16.63:4429
+
+------------------------------------------------------------------------------------------------------------------------

@@ -13,6 +13,7 @@ import java.util.Properties;
  */
 public class Config {
     private int proxyServerPort;
+    private int webServerPort;
     private String defacePage;
     private int logLevel;
     private String mode;
@@ -37,16 +38,17 @@ public class Config {
         Properties config = new Properties();
         config.load(fileReader);
         this.proxyServerPort = Integer.valueOf(config.getProperty("proxy.server.port"));
+        this.webServerPort = Integer.valueOf(config.getProperty("web.server.port"));
         this.defacePage = config.getProperty("deface.page");
         this.logLevel = Integer.valueOf(config.getProperty("log.level"));
-        this.mode = config.getProperty("mode");
+        this.mode = config.getProperty("mode").toUpperCase();
 
         validateConfiguration();
     }
 
     private void validateConfiguration() {
         try {
-            AttackMode.valueOf(this.mode.toUpperCase());
+            AttackMode.valueOf(this.mode);
         } catch (Exception ex) {
             LogService.fatal("Config file is invalid. invalid value for mode property", false);
             throw ex;
@@ -84,6 +86,14 @@ public class Config {
 
     public void setMode(String mode) {
         this.mode = mode;
+    }
+
+    public int getWebServerPort() {
+        return webServerPort;
+    }
+
+    public void setWebServerPort(int webServerPort) {
+        this.webServerPort = webServerPort;
     }
     //endregion
 }
