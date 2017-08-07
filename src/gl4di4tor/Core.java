@@ -16,7 +16,6 @@ public class Core {
             Thread webServerEngine = new WebServerEngine(Config.getInstance().getWebServerPort());
             webServerEngine.start();
 
-
         } catch (IOException e) {
             e.printStackTrace();
         }

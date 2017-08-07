@@ -1,6 +1,5 @@
 package gl4di4tor.engine.proxy;
 
-import com.diogonunes.jcdp.color.api.Ansi;
 import gl4di4tor.Router;
 import gl4di4tor.engine.BaseEngine;
 import gl4di4tor.log.LogService;

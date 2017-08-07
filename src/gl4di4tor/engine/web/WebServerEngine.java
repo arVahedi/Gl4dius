@@ -1,6 +1,5 @@
 package gl4di4tor.engine.web;
 
-import com.diogonunes.jcdp.color.api.Ansi;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -33,6 +32,7 @@ public class WebServerEngine extends BaseEngine {
         public void handle(HttpExchange httpExchange) throws IOException {
             LogService.log("HTTP request received from " + httpExchange.getRemoteAddress() + " for resource " +
                     httpExchange.getRequestURI().getPath());
+            System.out.println(httpExchange.getLocalAddress().getPort());
             new Thread(new WebServerHandler(httpExchange)).start();
         }
     }
