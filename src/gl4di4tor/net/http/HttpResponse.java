@@ -1,47 +1,51 @@
 package gl4di4tor.net.http;
 
-import gl4di4tor.configuration.Config;
-import gl4di4tor.log.LogService;
-import gl4di4tor.utility.file.FileUtility;
-
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * Created by gladiator on 7/11/17.
+ * Created by gladiator on 8/15/17.
  */
-public class HttpResponse {
+public class HttpResponse extends BaseHttpObject {
+    private int code;
+    private String description;
 
-    private static final Map<String, String> HTTP_HEADER_MAP = new HashMap<>();
-    private static final String HTTP_END_OF_HEADERS = "\r\n\r\n";
-
-    static {
-        HTTP_HEADER_MAP.put("Content-Type", "text/html");
-//        HTTP_HEADER_MAP.put("Strict-Transport-Security", "max-age=31536000");
+    public HttpResponse(String response) throws Exception {
+        super();
+        parseData(response);
     }
 
-    private static String makeHttpHeaders() {
-        StringBuilder stringBuilder = new StringBuilder("HTTP/1.1 200 OK\r\n");
-        HTTP_HEADER_MAP.forEach((key, value) -> {
-            stringBuilder.append(key);
-            stringBuilder.append(":");
-            stringBuilder.append(value);
-            stringBuilder.append("\r\n");
-        });
-        stringBuilder.append("Content-Length:");
+    @Override
+    protected void setRequestLine(String requestLine) throws Exception {
+        if (requestLine == null || requestLine.length() == 0) {
+            throw new Exception("Invalid Request-Line: " + requestLine);
+        }
+        this.requestLine = requestLine;
 
-        return stringBuilder.toString();
+        String[] args = this.requestLine.split(" ");
+        this.version = args[0].trim();
+        this.code = Integer.valueOf(args[1].trim());
+        this.description = "";
+        for (int i = 2; i < args.length; i++) {
+            if (!this.description.equalsIgnoreCase("")) {
+                this.description = this.description + " ";
+            }
+            this.description = this.description + args[i].trim();
+        }
     }
 
-    public static String makeHttpResponse(String path) throws Exception {
-        LogService.debug("Making response from " + path);
-        String defacePage = FileUtility.readFile(path,
-                StandardCharsets.UTF_8);
-        return makeHttpHeaders() + defacePage.length() + HTTP_END_OF_HEADERS + defacePage;
+    //region Getter and Setter
+    public int getCode() {
+        return code;
     }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    //endregion
 }

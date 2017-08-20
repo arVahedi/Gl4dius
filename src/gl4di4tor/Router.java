@@ -4,6 +4,7 @@ import gl4di4tor.configuration.Config;
 import gl4di4tor.log.LogService;
 import gl4di4tor.module.deface.DefaceModule;
 import gl4di4tor.module.phishing.PhishingModule;
+import gl4di4tor.module.sniff.SniffModule;
 
 import java.net.Socket;
 
@@ -31,6 +32,7 @@ public class Router {
                 new Thread(new PhishingModule(client)).start();
                 break;
             case SNIFF:
+                new Thread(new SniffModule(client)).start();
                 break;
             default:
                 LogService.error("Route not find.");

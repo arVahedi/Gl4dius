@@ -3,7 +3,7 @@ package gl4di4tor.module.deface;
 import gl4di4tor.configuration.Config;
 import gl4di4tor.log.LogService;
 import gl4di4tor.module.BaseModule;
-import gl4di4tor.net.http.HttpResponse;
+import gl4di4tor.net.http.HttpResponseMaker;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -26,7 +26,7 @@ public class DefaceModule extends BaseModule {
             DataInputStream in = new DataInputStream(this.socket.getInputStream());
             DataOutputStream out = new DataOutputStream(this.socket.getOutputStream());
 
-            out.writeUTF(HttpResponse.makeHttpResponse(Config.getInstance().getDefacePage()));
+            out.writeUTF(HttpResponseMaker.makeHttpResponse(Config.getInstance().getDefacePage()));
             out.flush();
             this.socket.close();
         }catch (NoSuchFileException e) {

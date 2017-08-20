@@ -1,5 +1,6 @@
 package gl4di4tor;
 
+import gl4di4tor.assets.AttackMode;
 import gl4di4tor.configuration.Config;
 import gl4di4tor.engine.proxy.ProxyEngine;
 import gl4di4tor.engine.web.WebServerEngine;
@@ -13,8 +14,10 @@ public class Core {
             Thread proxyEngine = new ProxyEngine(Config.getInstance().getProxyServerPort());
             proxyEngine.start();
 
-            Thread webServerEngine = new WebServerEngine(Config.getInstance().getWebServerPort());
-            webServerEngine.start();
+            if (Config.getInstance().getAttackMode() != AttackMode.SNIFF) {
+                Thread webServerEngine = new WebServerEngine(Config.getInstance().getWebServerPort());
+                webServerEngine.start();
+            }
 
         } catch (IOException e) {
             e.printStackTrace();

