@@ -37,5 +37,12 @@ public abstract class BaseModule implements Runnable {
         return dataString.getBytes();
     }
 
+    protected byte[] removeHSTSHeader(byte[] socketData) {
+        String dataString = new String(socketData);
+        dataString = dataString.replaceAll("Strict-Transport-Security: (.*)\r\n", "");
+
+        return dataString.getBytes();
+    }
+
     public abstract void execute();
 }

@@ -1,4 +1,4 @@
-package gl4di4tor.net;
+package gl4di4tor.net.channel;
 
 import gl4di4tor.log.LogService;
 import org.apache.commons.lang3.ArrayUtils;

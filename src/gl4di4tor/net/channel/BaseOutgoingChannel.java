@@ -1,4 +1,4 @@
-package gl4di4tor.net;
+package gl4di4tor.net.channel;
 
 import java.net.Socket;
 

@@ -3,8 +3,8 @@ package gl4di4tor.module.sniff;
 import gl4di4tor.configuration.Config;
 import gl4di4tor.log.LogService;
 import gl4di4tor.module.BaseModule;
-import gl4di4tor.net.OutgoingChannel;
-import gl4di4tor.net.SSLOutgoingChannel;
+import gl4di4tor.net.channel.OutgoingChannel;
+import gl4di4tor.net.channel.SSLOutgoingChannel;
 import gl4di4tor.net.http.HttpRequest;
 import gl4di4tor.net.http.HttpResponse;
 
@@ -34,7 +34,6 @@ public class SniffModule extends BaseModule {
             //ignore me;
         }
 
-        // FIXME: 8/1/17 Connection refused for SSL connections.
         if (httpRequest == null) {
             return;
         }
@@ -55,11 +54,15 @@ public class SniffModule extends BaseModule {
                     return;
                 }
                 dumpData(response);
-                serverResponse = new HttpResponse(new String(response));
+//                serverResponse = new HttpResponse(new String(response));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+//        String preProcessing = new String(response);
+        response = removeHSTSHeader(response);
+//        String postProcessing = new String(response);
 
         try {
             final OutputStream outToClient = this.socket.getOutputStream();

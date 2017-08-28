@@ -3,7 +3,7 @@ package gl4di4tor.module.phishing;
 import gl4di4tor.configuration.Config;
 import gl4di4tor.log.LogService;
 import gl4di4tor.module.BaseModule;
-import gl4di4tor.net.OutgoingChannel;
+import gl4di4tor.net.channel.OutgoingChannel;
 import gl4di4tor.net.http.HttpRequest;
 import gl4di4tor.net.http.HttpResponseMaker;
 
