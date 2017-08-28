@@ -12,6 +12,15 @@ public class HttpResponse extends BaseHttpObject {
         parseData(response);
     }
 
+    public boolean isRedirectResponse() {
+        return (this.code == 301 || this.code == 302);
+    }
+
+    public boolean isRedirectToSSL() {
+        return (isRedirectResponse() &&
+                this.getHeaderParam("Location").toLowerCase().startsWith("https://"));
+    }
+
     @Override
     protected void setRequestLine(String requestLine) throws Exception {
         if (requestLine == null || requestLine.length() == 0) {

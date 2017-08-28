@@ -35,7 +35,6 @@ public class PhishingModule extends BaseModule {
             //ignore me;
         }
 
-        // FIXME: 8/1/17 Connection refused for SSL connections.
         if (httpRequest == null) {
             return;
         }

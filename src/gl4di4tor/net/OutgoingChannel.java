@@ -4,39 +4,38 @@ import gl4di4tor.log.LogService;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.*;
-import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by gladiator on 7/31/17.
  */
-public class OutgoingChannel extends Thread {
-    private Socket clientSocket;
-    private final String SERVER_URL;
-    private final int SERVER_PORT;
-    private byte[] clientSocketData = null;
-    private int clientSocketDataLen;
-    private ChannelMode channelMode = ChannelMode.NON_BLOCKING;
-
-    public enum ChannelMode {
-        BLOCKING,
-        NON_BLOCKING;
-    }
+public class OutgoingChannel extends BaseOutgoingChannel {
 
     public OutgoingChannel(String host, Socket clientSocket, byte[] clientSocketData, int clientSocketDataLen,
                            ChannelMode channelMode) {
+        super();
         String[] tmp = host.split(":");
-        this.SERVER_URL = tmp[0];
-        this.SERVER_PORT = tmp.length > 1 ? Integer.valueOf(tmp[1]) : 80;
+
+        if (host.toLowerCase().startsWith("http://") || host.toLowerCase().startsWith("https://")) {
+            this.serverUrl = tmp[1].substring(2);
+            this.serverPort = tmp.length > 2 ? Integer.valueOf(tmp[2]) : 80;
+        } else {
+            this.serverUrl = tmp[0];
+            this.serverPort = tmp.length > 1 ? Integer.valueOf(tmp[1]) : 80;
+        }
+        if (this.serverUrl.endsWith("/")) {
+            this.serverUrl = this.serverUrl.substring(0, this.serverUrl.length() - 1);
+        }
+
         this.clientSocket = clientSocket;
         this.clientSocketData = clientSocketData;
         this.clientSocketDataLen = clientSocketDataLen;
         this.channelMode = channelMode;
     }
 
+    @Override
     public byte[] execute() {
         if (this.channelMode == ChannelMode.NON_BLOCKING) {
             this.start();
@@ -55,7 +54,7 @@ public class OutgoingChannel extends Thread {
 
     private void executeNonBlocking() {
         try {
-            if (this.SERVER_URL == null || this.SERVER_URL.equalsIgnoreCase("")) {
+            if (this.serverUrl == null || this.serverUrl.equalsIgnoreCase("")) {
                 LogService.debug("Server url is null in outgoing channel.");
                 return;
             }
@@ -68,7 +67,7 @@ public class OutgoingChannel extends Thread {
             Socket server;
             // connects a socket to the server
             try {
-                server = new Socket(this.SERVER_URL, this.SERVER_PORT);
+                server = new Socket(this.serverUrl, this.serverPort);
             } catch (IOException e) {
                 PrintWriter out = new PrintWriter(new OutputStreamWriter(
                         outToClient));
@@ -130,7 +129,7 @@ public class OutgoingChannel extends Thread {
 
     private byte[] executeBlocking() {
         try {
-            if (this.SERVER_URL == null || this.SERVER_URL.equalsIgnoreCase("")) {
+            if (this.serverUrl == null || this.serverUrl.equalsIgnoreCase("")) {
                 LogService.debug("Server url is null in outgoing channel.");
                 return null;
             }
@@ -141,18 +140,18 @@ public class OutgoingChannel extends Thread {
             Socket server;
             // connects a socket to the server
             try {
-                server = new Socket(this.SERVER_URL, this.SERVER_PORT);
+                server = new Socket(this.serverUrl, this.serverPort);
                 server.setKeepAlive(false);
             } catch (IOException e) {
-                LogService.error("Can not connect to " + this.SERVER_URL + ":" + this.SERVER_PORT);
+                LogService.error("Can not connect to " + this.serverUrl + ":" + this.serverPort);
                 throw new RuntimeException(e);
             }
             // a new thread to manage streams from server to client (DOWNLOAD)
             final BufferedInputStream inFromServer = new BufferedInputStream(server.getInputStream());
             final BufferedOutputStream outToServer = new BufferedOutputStream(server.getOutputStream());
             // a new thread for uploading to the server
-            /*new Thread() {
-                public void run() {*/
+            new Thread() {
+                public void run() {
                     int clientBytesRead;
                     try {
                         if (clientSocketData == null) {
@@ -168,22 +167,17 @@ public class OutgoingChannel extends Thread {
                     } catch (IOException e) {
                         //ignore me
                     }
-                /*}
-            }.start();*/
+                }
+            }.start();
             // current thread manages streams from server to client (DOWNLOAD)
             int serverBytesRead;
             List<Byte> serverResponse = new ArrayList<>();
             try {
-                LogService.info(this.getName() + " - IN WHILE");
                 while ((serverBytesRead = inFromServer.read(reply)) > 0) {
-                    LogService.info(this.getName() + " READ : " + serverBytesRead);
                     for (int counter = 0; counter < serverBytesRead; counter++) {
-//                        System.out.print(String.format("%02x", reply[counter]) + " ");
                         serverResponse.add(reply[counter]);
                     }
-//                    System.out.print("\n");
                 }
-                LogService.info(this.getName() + " - OUT WHILE");
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {

@@ -28,5 +28,14 @@ public abstract class BaseModule implements Runnable {
         LogService.log(new String(data), Ansi.FColor.NONE, Ansi.BColor.NONE);
     }
 
+    protected byte[] removeKeepAliveHeader(byte[] socketData) {
+        String dataString = new String(socketData);
+        dataString = dataString.replace("Connection: keep-alive", "Connection: close");
+        /*if (dataString.contains("Keep-alive:")) {
+            System.out.println(dataString);
+        }*/
+        return dataString.getBytes();
+    }
+
     public abstract void execute();
 }

@@ -17,9 +17,10 @@ public class Config {
     private String defacePage;
     private int logLevel;
     private String mode;
-    private String phishingMethod;
+    //    private String phishingMethod;
     private String phishingTargetDomain;
     private String phishingPage;
+    private boolean sslEnable;
     //endregion
 
     //region Virtual Fields
@@ -50,9 +51,10 @@ public class Config {
         this.defacePage = config.getProperty("deface.page");
         this.logLevel = Integer.valueOf(config.getProperty("log.level"));
         this.mode = config.getProperty("mode").toUpperCase();
-        this.phishingMethod = config.getProperty("phishing.method");
+//        this.phishingMethod = config.getProperty("phishing.method");
         this.phishingTargetDomain = config.getProperty("phishing.target.domain");
         this.phishingPage = config.getProperty("phishing.page");
+        this.sslEnable = config.getProperty("ssl.strip").equalsIgnoreCase("enable");
 
         validateConfiguration();
     }
@@ -107,13 +109,13 @@ public class Config {
         this.webServerPort = webServerPort;
     }
 
-    public String getPhishingMethod() {
+    /*public String getPhishingMethod() {
         return phishingMethod;
     }
 
     public void setPhishingMethod(String phishingMethod) {
         this.phishingMethod = phishingMethod;
-    }
+    }*/
 
     public AttackMode getAttackMode() {
         return attackMode;
@@ -137,6 +139,14 @@ public class Config {
 
     public void setPhishingPage(String phishingPage) {
         this.phishingPage = phishingPage;
+    }
+
+    public boolean isSslEnable() {
+        return sslEnable;
+    }
+
+    public void setSslEnable(boolean sslEnable) {
+        this.sslEnable = sslEnable;
     }
     //endregion
 }

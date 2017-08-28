@@ -1,8 +1,10 @@
 package gl4di4tor.module.sniff;
 
+import gl4di4tor.configuration.Config;
 import gl4di4tor.log.LogService;
 import gl4di4tor.module.BaseModule;
 import gl4di4tor.net.OutgoingChannel;
+import gl4di4tor.net.SSLOutgoingChannel;
 import gl4di4tor.net.http.HttpRequest;
 import gl4di4tor.net.http.HttpResponse;
 
@@ -36,7 +38,7 @@ public class SniffModule extends BaseModule {
         if (httpRequest == null) {
             return;
         }
-
+        socketData = removeKeepAliveHeader(socketData);
         byte[] response = new OutgoingChannel(httpRequest.getHeaderParam("Host"), this.socket, socketData, dataLen,
                 OutgoingChannel.ChannelMode.BLOCKING).execute();
         if (response == null) {
@@ -46,11 +48,17 @@ public class SniffModule extends BaseModule {
         HttpResponse serverResponse;
         try {
             serverResponse = new HttpResponse(new String(response));
-            if (serverResponse.getCode() == 301 || serverResponse.getCode() == 302) {
-                LogService.log("sdjffffffffffffffffffffffffffa;lkjlasdjf;");
+            if (serverResponse.isRedirectToSSL() && Config.getInstance().isSslEnable()) {
+                response = new SSLOutgoingChannel(serverResponse.getHeaderParam("Location"), socketData,
+                        dataLen).execute();
+                if (response == null) {
+                    return;
+                }
+                dumpData(response);
+                serverResponse = new HttpResponse(new String(response));
             }
         } catch (Exception e) {
-            //ignore me
+            e.printStackTrace();
         }
 
         try {
