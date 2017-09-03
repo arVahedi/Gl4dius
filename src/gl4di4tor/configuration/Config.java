@@ -12,6 +12,8 @@ import java.util.Properties;
  */
 public class Config {
     //region Fields
+    private String serverIP;
+    private String serverNIC;
     private int proxyServerPort;
     private int webServerPort;
     private String defacePage;
@@ -46,6 +48,8 @@ public class Config {
         FileReader fileReader = new FileReader(configFile);
         Properties config = new Properties();
         config.load(fileReader);
+        this.serverIP = config.getProperty("server.ip");
+        this.serverNIC = config.getProperty("server.NIC");
         this.proxyServerPort = Integer.valueOf(config.getProperty("proxy.server.port"));
         this.webServerPort = Integer.valueOf(config.getProperty("web.server.port"));
         this.defacePage = config.getProperty("deface.page");
@@ -147,6 +151,22 @@ public class Config {
 
     public void setSslEnable(boolean sslEnable) {
         this.sslEnable = sslEnable;
+    }
+
+    public String getServerIP() {
+        return serverIP;
+    }
+
+    public void setServerIP(String serverIP) {
+        this.serverIP = serverIP;
+    }
+
+    public String getServerNIC() {
+        return serverNIC;
+    }
+
+    public void setServerNIC(String serverNIC) {
+        this.serverNIC = serverNIC;
     }
     //endregion
 }
