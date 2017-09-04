@@ -61,7 +61,8 @@ public class SniffModule extends BaseModule {
         }
 
 //        String preProcessing = new String(response);
-        response = removeHSTSHeader(response);
+        //Fixme: test this method.
+//        response = removeHSTSHeader(response);
 //        String postProcessing = new String(response);
 
         try {
