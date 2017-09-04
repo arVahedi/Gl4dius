@@ -3,7 +3,7 @@ package gl4di4tor.utility.os;
 /**
  * Created by gladiator on 9/3/17.
  */
-public class OS {
+public class OSDetector {
     private static String operationSystem = System.getProperty("os.name").toLowerCase();
 
     public static boolean isWindows() {

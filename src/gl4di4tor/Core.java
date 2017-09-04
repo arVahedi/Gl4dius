@@ -16,10 +16,10 @@ public class Core {
 
     public static void main(String[] args) throws Exception {
         try {
-            /*if (!Authorization.isRootUser()) {
+            if (!Authorization.isRootUser()) {
                 LogService.fatal(ErrorCode.PERMISSION_DENIED.getDescription());
                 System.exit(ErrorCode.PERMISSION_DENIED.getValue());
-            }*/
+            }
 
             Firewall firewall = FirewallFactory.getFirewallInstance();
 
@@ -33,6 +33,13 @@ public class Core {
                 webServerEngine.start();
             }
 
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    firewall.clearRules();
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }, "Shutdown-thread"));
         } catch (IOException e) {
             e.printStackTrace();
         }
