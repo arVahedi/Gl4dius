@@ -25,7 +25,7 @@ Use the config file for config tool, select kind of attack, and other properties
 after that you can simply run tool like other java programs.
 
 (I wrote a imperfect documentation Deliberately, to prevent script kiddies to use this tool. 
-If you are a grand master hacker accept my apologies, of course you can use this tool with few R&D.)
+If you are a grand master hacker accept my apologies, of course you can use this tool with little R&D.)
 
 ## Contact me :
 
