@@ -17,6 +17,7 @@ public class Config {
     private int proxyServerPort;
     private int webServerPort;
     private String defacePage;
+    private boolean defaceDumpingData = false;
     private int logLevel;
     private String mode;
     //    private String phishingMethod;
@@ -53,6 +54,7 @@ public class Config {
         this.proxyServerPort = Integer.valueOf(config.getProperty("proxy.server.port"));
         this.webServerPort = Integer.valueOf(config.getProperty("web.server.port"));
         this.defacePage = config.getProperty("deface.page");
+        this.defaceDumpingData = Boolean.valueOf(config.getProperty("deface.dumping.data"));
         this.logLevel = Integer.valueOf(config.getProperty("log.level"));
         this.mode = config.getProperty("mode").toUpperCase();
 //        this.phishingMethod = config.getProperty("phishing.method");
@@ -167,6 +169,14 @@ public class Config {
 
     public void setServerNIC(String serverNIC) {
         this.serverNIC = serverNIC;
+    }
+
+    public boolean isDefaceDumpingData() {
+        return defaceDumpingData;
+    }
+
+    public void setDefaceDumpingData(boolean defaceDumpingData) {
+        this.defaceDumpingData = defaceDumpingData;
     }
     //endregion
 }

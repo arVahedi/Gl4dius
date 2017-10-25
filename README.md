@@ -6,7 +6,7 @@ A very powerful tool for All kind of MITM attacks.
 - deface attack on whole LAN network
 - Phishing attack
 - Sniffing attack
-- SSL downgrade attack (**SSL-Stipping**)
+- SSL downgrade attack (**SSL-Stripping**)
 - Bypass **HSTS** protection
 - Cover your track from discovery methods automatically. (**Be Careful** : No guarantee that you will be 
 invisible completely. A hacker who understand MITM attacks deeply, can hunt you yet. But it will be very difficult for normal 

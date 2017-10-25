@@ -26,10 +26,17 @@ public class DefaceModule extends BaseModule {
             DataInputStream in = new DataInputStream(this.socket.getInputStream());
             DataOutputStream out = new DataOutputStream(this.socket.getOutputStream());
 
+            if (Config.getInstance().isDefaceDumpingData()) {
+                byte[] socketData = new byte[32768];
+                readData(socketData);
+                dumpData(socketData);
+            }
+
             out.writeUTF(HttpResponseMaker.makeHttpResponse(Config.getInstance().getDefacePage()));
             out.flush();
-            this.socket.close();
-        }catch (NoSuchFileException e) {
+            //If close socket here it can be throw ERR_CONNECTION_RESET in some browser.(e.g Chrome)
+//            this.socket.close();
+        } catch (NoSuchFileException e) {
             try {
                 LogService.error(Config.getInstance().getDefacePage() + " not find.");
             } catch (Exception e1) {

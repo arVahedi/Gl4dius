@@ -2,3 +2,5 @@
 /.idea/
 /*.iml
 /www/parsGate/
+/www/tplink/
+*.html
