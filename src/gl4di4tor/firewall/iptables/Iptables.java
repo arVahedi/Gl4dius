@@ -12,15 +12,16 @@ import java.io.IOException;
 public class Iptables implements Firewall {
 
     private static final String PROXY_SERVER_RULE =
-            "iptables -t nat -A PREROUTING -i %s -p tcp --dport 80 -j DNAT --to-destination %s:%s";
+            "iptables -t nat %s PREROUTING -i %s -p tcp --dport 80 -j DNAT --to-destination %s:%s";
     private static final String WEB_SERVER_RULE =
-            "iptables -t nat -A PREROUTING -i %s -p tcp --dport 4444 -j DNAT --to-destination %s:%s";
+            "iptables -t nat %s PREROUTING -i %s -p tcp --dport 4444 -j DNAT --to-destination %s:%s";
     private static final String CLEAR_RULE =
             "iptables -t nat -F";
 
     @Override
     public void addProxyServerRules() throws Exception {
         String output = OSExecutor.execute(String.format(PROXY_SERVER_RULE,
+                RuleOperation.ADD.getValue(),
                 Config.getInstance().getServerNIC(),
                 Config.getInstance().getServerIP(),
                 Config.getInstance().getProxyServerPort()));
@@ -29,13 +30,51 @@ public class Iptables implements Firewall {
     @Override
     public void addWebServerRules() throws Exception {
         String output = OSExecutor.execute(String.format(WEB_SERVER_RULE,
+                RuleOperation.ADD.getValue(),
                 Config.getInstance().getServerNIC(),
                 Config.getInstance().getServerIP(),
                 Config.getInstance().getWebServerPort()));
     }
 
     @Override
-    public void clearRules() throws IOException, InterruptedException {
+    public void clearProxyServerRules() throws Exception {
+        String output = OSExecutor.execute(String.format(PROXY_SERVER_RULE,
+                RuleOperation.DELETE.getValue(),
+                Config.getInstance().getServerNIC(),
+                Config.getInstance().getServerIP(),
+                Config.getInstance().getProxyServerPort()));
+    }
+
+    @Override
+    public void clearWebServerRules() throws Exception {
+        String output = OSExecutor.execute(String.format(WEB_SERVER_RULE,
+                RuleOperation.DELETE.getValue(),
+                Config.getInstance().getServerNIC(),
+                Config.getInstance().getServerIP(),
+                Config.getInstance().getWebServerPort()));
+    }
+
+    @Override
+    public void flush() throws IOException, InterruptedException {
         OSExecutor.execute(CLEAR_RULE);
+    }
+
+    private enum RuleOperation {
+        ADD("-A"),
+        DELETE("-D");
+
+        private String value;
+
+        RuleOperation(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
     }
 }

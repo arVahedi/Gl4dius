@@ -19,7 +19,17 @@ public class Pf implements Firewall {
     }
 
     @Override
-    public void clearRules() throws IOException, InterruptedException {
+    public void clearProxyServerRules() throws Exception {
+
+    }
+
+    @Override
+    public void clearWebServerRules() throws Exception {
+
+    }
+
+    @Override
+    public void flush() throws IOException, InterruptedException {
 
     }
 }

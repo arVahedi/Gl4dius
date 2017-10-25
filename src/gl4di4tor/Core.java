@@ -35,8 +35,11 @@ public class Core {
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
-                    firewall.clearRules();
-                } catch (IOException | InterruptedException e) {
+                    firewall.clearProxyServerRules();
+                    if (Config.getInstance().getAttackMode() != AttackMode.SNIFF) {
+                        firewall.clearWebServerRules();
+                    }
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }, "Shutdown-thread"));

@@ -10,5 +10,9 @@ public interface Firewall {
 
     public void addWebServerRules() throws Exception;
 
-    public void clearRules() throws IOException, InterruptedException;
+    public void clearProxyServerRules() throws Exception;
+
+    public void clearWebServerRules() throws Exception;
+
+    public void flush() throws IOException, InterruptedException;
 }
