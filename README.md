@@ -2,6 +2,8 @@
 #### (Powered by Gl4di4tor)
 A very powerful tool for All kind of MITM attacks.
 
+![Alt Gl4dius](./logoTransparent.png)
+
 ## Features : 
 - deface attack on whole LAN network
 - Phishing attack
