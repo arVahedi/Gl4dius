@@ -53,7 +53,7 @@ public class PhishingModule extends BaseModule {
             this.socket.close();
         } catch (NoSuchFileException e) {
             try {
-                LogService.error(Config.getInstance().getDefacePage() + " not find.");
+                LogService.error(Config.getInstance().getPhishingPage() + " not find.");
             } catch (Exception ex) {
                 LogService.error(ex);
             }
