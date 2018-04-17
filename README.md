@@ -12,7 +12,7 @@ A very powerful tool for All kind of MITM attacks.
 - Bypass **HSTS** protection
 - Cover your track from discovery methods automatically. (**Be Careful** : No guarantee that you will be 
 invisible completely. A hacker who understand MITM attacks deeply, can hunt you yet. But it will be very difficult for normal 
-people or script kiddies to tracking you.) 
+people or script kiddies to track you.) 
 
 **Note :** If you are a script kiddie please don't try to use this tool. Anyway it will not work for you. (I guarantee that!)
 
