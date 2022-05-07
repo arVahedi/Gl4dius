@@ -1,4 +1,4 @@
-package io.gl4dius;
+package io.gl4dius.core;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
