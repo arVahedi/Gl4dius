@@ -1,4 +1,4 @@
-package io.gl4dius.core;
+package io.gl4dius.cli;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class Gl4diusApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(Gl4diusApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(Gl4diusApplication.class, args);
+    }
 
 }

@@ -10,11 +10,12 @@
         <version>2.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>core</artifactId>
+    <artifactId>cli</artifactId>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <spring-shell.version>4.0.2</spring-shell.version>
     </properties>
 
     <dependencies>
@@ -26,7 +27,13 @@
         <dependency>
             <groupId>org.springframework.shell</groupId>
             <artifactId>spring-shell-starter</artifactId>
-            <version>2.1.0-SNAPSHOT</version>
+            <version>${spring-shell.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.shell</groupId>
+            <artifactId>spring-shell-jline</artifactId>
+            <version>${spring-shell.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
