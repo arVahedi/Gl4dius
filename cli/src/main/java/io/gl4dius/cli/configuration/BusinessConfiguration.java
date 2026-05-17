@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class BusinessConfiguration {
 
-    @Value("${cli.prompt.key}")
+    @Value("${gl4dius.cli.prompt.key}")
     private String promptKey;
-
 }

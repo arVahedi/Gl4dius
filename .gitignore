@@ -5,6 +5,10 @@
 # Log file
 *.log
 
+# Runtime SQLite database
+gl4dius.db
+.gl4dius.db
+
 # BlueJ files
 *.ctxt
 

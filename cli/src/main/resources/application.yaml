@@ -1,3 +1,6 @@
-cli:
-  prompt:
-    key: Gl4dius:>
+gl4dius:
+  cli:
+    prompt:
+      key: Gl4dius:>
+  database:
+    file-name: .gl4dius.db

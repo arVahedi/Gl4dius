@@ -1,6 +1,5 @@
 package io.gl4dius.cli.configuration;
 
-import lombok.RequiredArgsConstructor;
 import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStyle;
 import org.jspecify.annotations.NonNull;
@@ -8,10 +7,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.shell.jline.PromptProvider;
 
 @Configuration
-@RequiredArgsConstructor
 public class PromptConfiguration implements PromptProvider {
 
     private final BusinessConfiguration businessConfiguration;
+
+    public PromptConfiguration(BusinessConfiguration businessConfiguration) {
+        this.businessConfiguration = businessConfiguration;
+    }
 
     @Override
     public @NonNull AttributedString getPrompt() {
