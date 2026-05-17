@@ -14,8 +14,6 @@ A very powerful tool for All kinds of MITM attacks.
 invisible completely. A hacker who understands MITM attacks deeply, can hunt you yet. But it will be challenging for normal 
 people or script kiddies to track you.)
 
-**Note:** If you are a script kiddie, please don't try to use this tool. Anyway, it will not work for you. (I guarantee that!)
-
 ## Dependencies : 
 
 - iptables
