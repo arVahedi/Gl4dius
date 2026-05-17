@@ -22,7 +22,8 @@ services:
         ipv4_address: 172.28.0.10
 
   victim:
-    image: ubuntu:26.04
+    #    image: ubuntu:26.04
+    image: gl4dius-dev:latest
     container_name: victim
     command: sleep infinity
     cap_add:
