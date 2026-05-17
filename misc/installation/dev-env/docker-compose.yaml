@@ -1,0 +1,40 @@
+name: gl4dius-stack
+
+services:
+  gl4dius:
+    image: gl4dius-dev:latest
+    build:
+      context: .
+      dockerfile: misc/installation/dev-env/Dockerfile
+    container_name: gl4dius
+    working_dir: /app
+    volumes:
+      - ./cli/target/gl4dius.jar:/app/gl4dius.jar:ro
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    privileged: false
+    stdin_open: true
+    tty: true
+    command: /bin/bash
+    networks:
+      gl4dius-lab:
+        ipv4_address: 172.28.0.10
+
+  victim:
+    image: ubuntu:26.04
+    container_name: victim
+    command: sleep infinity
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    networks:
+      gl4dius-lab:
+        ipv4_address: 172.28.0.20
+
+networks:
+  gl4dius-lab:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24
