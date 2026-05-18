@@ -56,10 +56,21 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.pcap4j</groupId>
+            <artifactId>pcap4j-core</artifactId>
+            <version>1.8.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.pcap4j</groupId>
+            <artifactId>pcap4j-packetfactory-static</artifactId>
+            <version>1.8.2</version>
+        </dependency>
     </dependencies>
 
     <build>
-        <finalName>gl4dius</finalName>
+        <finalName>gl4dius-cli</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

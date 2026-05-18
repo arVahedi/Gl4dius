@@ -9,7 +9,7 @@ services:
     container_name: gl4dius
     working_dir: /app
     volumes:
-      - ./cli/target/gl4dius.jar:/app/gl4dius.jar:ro
+      - ./cli/target:/app
     cap_add:
       - NET_ADMIN
       - NET_RAW
