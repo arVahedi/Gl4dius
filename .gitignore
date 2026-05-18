@@ -8,6 +8,7 @@
 # Runtime SQLite database
 gl4dius.db
 .gl4dius.db
+.gl4dius-test.db
 
 # BlueJ files
 *.ctxt

@@ -1,3 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:sqlite:${gl4dius.cli.database.file-name}
+    driver-class-name: org.sqlite.JDBC
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
 gl4dius:
   cli:
     prompt:
