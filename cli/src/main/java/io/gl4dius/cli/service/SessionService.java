@@ -8,6 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -15,8 +19,7 @@ public class SessionService {
 
     private final SessionRepository sessionRepository;
 
-
-    public Session createSession(String name, String description, AttackMode mode) {
+    public Session createSession(String name, String description) {
         if (StringUtils.hasText(name) && this.sessionRepository.findByName(name).isPresent()) {
             throw new IllegalArgumentException("Session name %s already exists".formatted(name));
         }
@@ -24,7 +27,6 @@ public class SessionService {
         var session = new Session();
         session.setName(name);
         session.setDescription(description);
-        session.setMode(mode);
 
         session = this.sessionRepository.save(session);
 
@@ -37,16 +39,26 @@ public class SessionService {
         return session;
     }
 
-    public void deleteSession(String identifier) {
-
+    public Session deleteSession(String identifier) {
+        var session = this.getSession(identifier);
+        this.sessionRepository.delete(session);
+        log.info("Deleted session {}", session.getId());
+        return session;
     }
 
-    public void listSessions() {
-
+    public List<Session> listSessions() {
+        return this.sessionRepository.findAll();
     }
 
-    public void getSession() {
+    public Session getSession(String identifier) {
+        if (!StringUtils.hasText(identifier)) {
+            throw new IllegalArgumentException("Session identifier must not be blank");
+        }
 
+        return parseUuid(identifier)
+                .flatMap(this.sessionRepository::findById)
+                .or(() -> this.sessionRepository.findByName(identifier))
+                .orElseThrow(() -> new IllegalArgumentException("Session %s not found".formatted(identifier)));
     }
 
     public void updateSession() {
@@ -63,5 +75,13 @@ public class SessionService {
 
     public void stopSession() {
 
+    }
+
+    private Optional<UUID> parseUuid(String identifier) {
+        try {
+            return Optional.of(UUID.fromString(identifier));
+        } catch (IllegalArgumentException ex) {
+            return Optional.empty();
+        }
     }
 }

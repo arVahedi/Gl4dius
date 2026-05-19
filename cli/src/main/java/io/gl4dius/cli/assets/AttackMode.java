@@ -10,8 +10,8 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public enum AttackMode {
     DEFACING("def"),
-    PHISHING("ph"),
-    SNIFFING("sn");
+    SNIFFING("sn"),
+    PHISHING("ph");
 
     private final String shortName;
 

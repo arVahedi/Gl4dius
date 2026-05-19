@@ -1,12 +1,15 @@
 package io.gl4dius.cli.model.entity;
 
 import io.gl4dius.cli.assets.AttackMode;
+import io.gl4dius.cli.model.SessionConfig;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -23,18 +26,15 @@ public class Session {
     @Column(nullable = false, updatable = false, length = 36)
     private UUID id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name")
     private String name;
 
     @Column(name = "description")
     private String description;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "mode", nullable = false)
-    private AttackMode mode;
-
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "config")
-    private String config;
+    private SessionConfig config;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
