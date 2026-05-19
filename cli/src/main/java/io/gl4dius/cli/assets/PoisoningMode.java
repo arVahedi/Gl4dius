@@ -18,6 +18,6 @@ public enum PoisoningMode {
         return Arrays.stream(PoisoningMode.values())
                 .filter(mode -> mode.getAcronym().equalsIgnoreCase(acronym))
                 .findAny()
-                .orElseThrow(() -> new IllegalArgumentException("Unknown poisoning mode: " + acronym));
+                .orElseThrow(() -> new IllegalArgumentException("Unknown poisoning mode: %s".formatted(acronym)));
     }
 }

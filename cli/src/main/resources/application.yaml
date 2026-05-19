@@ -1,6 +1,5 @@
 spring:
   datasource:
-    url: jdbc:sqlite:${gl4dius.cli.database.file-name}
     driver-class-name: org.sqlite.JDBC
   jpa:
     database-platform: org.hibernate.community.dialect.SQLiteDialect
