@@ -1,7 +1,7 @@
 package io.gl4dius.cli.command;
 
 import io.gl4dius.cli.model.entity.Session;
-import io.gl4dius.cli.service.SessionService;
+import io.gl4dius.cli.service.SessionManagementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -19,13 +19,10 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@CommandGroup(name = "Session", description = "session management commands")
-public class SessionCommands {
+@CommandGroup(name = "Session Management", description = "session management commands")
+public class SessionManagementCommands {
 
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME
-            .withZone(ZoneId.systemDefault());
-
-    private final SessionService sessionService;
+    private final SessionManagementService sessionManagementService;
 
     @Command(name = "session init", description = "Create a new session")
     public void createSession(
@@ -33,47 +30,40 @@ public class SessionCommands {
             String name,
             @Option(longName = "description", shortName = 'd', description = "Description of the session")
             String description) {
-        this.sessionService.createSession(name, description);
+        this.sessionManagementService.createSession(name, description);
     }
 
     @Command(name = "session rm", description = "Delete a session")
     public String deleteSession(
-            @Argument(index = 0, description = "ID or Name of the session to remove")
+            @Argument(index = 0, description = "ID or Name of the session to remove (default is current session)")
             String identifier) {
-        var session = this.sessionService.deleteSession(identifier);
+        var session = this.sessionManagementService.deleteSession(identifier);
         return "Deleted session %s (%s)".formatted(session.getName(), session.getId());
     }
 
     @Command(name = "session ls", description = "List all sessions")
     public String listSessions() {
-        return this.formatSessions(this.sessionService.listSessions());
+        return this.formatSessions(this.sessionManagementService.listSessions());
     }
 
     @Command(name = "session get", description = "Get a session")
     public String getSession(
-            @Argument(index = 0, description = "ID or Name of the session to remove")
+            @Argument(index = 0, description = "ID or Name of the session to remove (default is current session)")
             String identifier
     ) {
-        return this.formatSession(this.sessionService.getSession(identifier));
+        return this.formatSession(this.sessionManagementService.getSession(identifier));
     }
 
-    @Command(name = "session update", description = "Update current session")
-    public void updateSession() {
-    }
-
-    @Command(name = "session switch", description = "Switch to another session")
-    public void switchSession(
-            @Argument(index = 0, description = "ID or Name of the session to remove")
-            String identifier
+    @Command(name = "session edit", description = "Update current session")
+    public void updateSession(
+            @Argument(index = 0, description = "ID or Name of the session to remove (default is current session)")
+            String identifier,
+            @Option(longName = "name", shortName = 'n', description = "Name to session")
+            String name,
+            @Option(longName = "description", shortName = 'd', description = "Description of the session")
+            String description
     ) {
-    }
-
-    @Command(name = "session start", description = "Start current session")
-    public void startSession() {
-    }
-
-    @Command(name = "session stop", description = "Stop current session")
-    public void stopSession() {
+        this.sessionManagementService.updateSession(identifier, name, description);
     }
 
     private @NonNull String formatSessions(@NonNull List<Session> sessions) {
@@ -118,7 +108,9 @@ public class SessionCommands {
     }
 
     private @NonNull String formatInstant(Instant instant) {
-        return instant == null ? "-" : DATE_FORMATTER.format(instant);
+        return instant == null ? "-" : DateTimeFormatter.ISO_OFFSET_DATE_TIME
+                .withZone(ZoneId.systemDefault())
+                .format(instant);
     }
 
     private String formatNullable(Object value) {

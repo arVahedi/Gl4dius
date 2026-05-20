@@ -1,7 +1,7 @@
 package io.gl4dius.cli.command;
 
 import io.gl4dius.cli.fixture.SessionFixtures;
-import io.gl4dius.cli.service.SessionService;
+import io.gl4dius.cli.service.SessionManagementService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,20 +15,20 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class SessionCommandsTest {
+class SessionManagementCommandsTest {
 
     @Mock
-    private SessionService sessionService;
+    private SessionManagementService sessionManagementService;
 
     @InjectMocks
-    private SessionCommands sessionCommands;
+    private SessionManagementCommands sessionManagementCommands;
 
     @Test
     void whenDeleteSession_thenDelegatesToServiceAndReturnsConfirmation() {
         var session = SessionFixtures.session(s -> s.setName("demo"));
-        when(sessionService.deleteSession("demo")).thenReturn(session);
+        when(sessionManagementService.deleteSession("demo")).thenReturn(session);
 
-        var output = sessionCommands.deleteSession("demo");
+        var output = sessionManagementCommands.deleteSession("demo");
 
         assertThat(output)
                 .contains("Deleted session demo")
@@ -38,9 +38,9 @@ class SessionCommandsTest {
     @Test
     void whenListSessions_thenFormatsSessions() {
         var session = SessionFixtures.session(s -> s.setName("demo"));
-        when(sessionService.listSessions()).thenReturn(List.of(session));
+        when(sessionManagementService.listSessions()).thenReturn(List.of(session));
 
-        var output = sessionCommands.listSessions();
+        var output = sessionManagementCommands.listSessions();
 
         assertThat(output)
                 .contains("ID | Name | Mode | Description | Created At | Last Updated At")
@@ -52,17 +52,17 @@ class SessionCommandsTest {
 
     @Test
     void whenListSessions_thenFormatsEmptyList() {
-        when(sessionService.listSessions()).thenReturn(List.of());
+        when(sessionManagementService.listSessions()).thenReturn(List.of());
 
-        assertThat(sessionCommands.listSessions()).isEqualTo("No sessions found");
+        assertThat(sessionManagementCommands.listSessions()).isEqualTo("No sessions found");
     }
 
     @Test
     void whenGetSession_thenFormatsSession() {
         var session = SessionFixtures.session(s -> s.setName("demo"));
-        when(sessionService.getSession("demo")).thenReturn(session);
+        when(sessionManagementService.getSession("demo")).thenReturn(session);
 
-        var output = sessionCommands.getSession("demo");
+        var output = sessionManagementCommands.getSession("demo");
 
         assertThat(output)
                 .contains("ID: " + session.getId())
@@ -73,8 +73,8 @@ class SessionCommandsTest {
 
     @Test
     void whenCreateSession_thenDelegatesToService() {
-        sessionCommands.createSession("demo", "test session");
+        sessionManagementCommands.createSession("demo", "test session");
 
-        verify(sessionService).createSession("demo", "test session");
+        verify(sessionManagementService).createSession("demo", "test session");
     }
 }

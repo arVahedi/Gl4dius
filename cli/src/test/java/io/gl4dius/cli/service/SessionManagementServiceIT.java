@@ -1,15 +1,11 @@
 package io.gl4dius.cli.service;
 
-import io.gl4dius.cli.assets.AttackMode;
-import io.gl4dius.cli.command.SessionCommands;
+import io.gl4dius.cli.command.SessionManagementCommands;
 import io.gl4dius.cli.repository.SessionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -18,13 +14,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
         "spring.datasource.url=jdbc:sqlite:target/session-service-it-${random.uuid}.db",
         "spring.shell.interactive.enabled=false"
 })
-class SessionServiceIT {
+class SessionManagementServiceIT {
 
     @Autowired
-    private SessionService sessionService;
+    private SessionManagementService sessionManagementService;
 
     @Autowired
-    private SessionCommands sessionCommands;
+    private SessionManagementCommands sessionManagementCommands;
 
     @Autowired
     private SessionRepository sessionRepository;
@@ -36,39 +32,39 @@ class SessionServiceIT {
 
     @Test
     void whenCreatesListsAndGetsAndDeletesSession_thenSucceeds() {
-        var created = sessionService.createSession("demo", "integration session");
+        var created = sessionManagementService.createSession("demo", "integration session");
 
         assertThat(created.getId()).isNotNull();
         assertThat(created.getCreatedAt()).isNotNull();
 
-        var listed = sessionService.listSessions();
+        var listed = sessionManagementService.listSessions();
         assertThat(listed).hasSize(1);
         assertThat(listed.getFirst().getName()).isEqualTo("demo");
 
-        var byName = sessionService.getSession("demo");
-        var byId = sessionService.getSession(created.getId().toString());
+        var byName = sessionManagementService.getSession("demo");
+        var byId = sessionManagementService.getSession(created.getId().toString());
         assertThat(byName.getId()).isEqualTo(created.getId());
         assertThat(byId.getName()).isEqualTo("demo");
 
-        var getOutput = sessionCommands.getSession("demo");
-        var listOutput = sessionCommands.listSessions();
+        var getOutput = sessionManagementCommands.getSession("demo");
+        var listOutput = sessionManagementCommands.listSessions();
         assertThat(getOutput).contains("Name: demo", "Mode: PHISHING");
         assertThat(listOutput).contains(created.getId().toString(), "integration session");
 
-        var deleted = sessionService.deleteSession("demo");
+        var deleted = sessionManagementService.deleteSession("demo");
         assertThat(deleted.getId()).isEqualTo(created.getId());
-        assertThat(sessionService.listSessions()).isEmpty();
-        assertThatThrownBy(() -> sessionService.getSession("demo"))
+        assertThat(sessionManagementService.listSessions()).isEmpty();
+        assertThatThrownBy(() -> sessionManagementService.getSession("demo"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Session demo not found");
     }
 
     @Test
     void whenCreatesSessionWithoutName_thenUsesIdAsName() {
-        var created = sessionService.createSession(null, null);
+        var created = sessionManagementService.createSession(null, null);
 
         assertThat(created.getName()).isEqualTo(created.getId().toString());
-        assertThat(sessionService.getSession(created.getId().toString()).getName()).isEqualTo(created.getName());
+        assertThat(sessionManagementService.getSession(created.getId().toString()).getName()).isEqualTo(created.getName());
     }
 
     /*@TestConfiguration

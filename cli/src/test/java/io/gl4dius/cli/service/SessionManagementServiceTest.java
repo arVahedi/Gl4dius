@@ -19,13 +19,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class SessionServiceTest {
+class SessionManagementServiceTest {
 
     @Mock
     private SessionRepository sessionRepository;
+    @Mock
+    private SessionExecutionService sessionExecutionService;
 
     @InjectMocks
-    private SessionService sessionService;
+    private SessionManagementService sessionManagementService;
 
     @Test
     void whenCreateSession_thenPersistsSession() {
@@ -36,7 +38,7 @@ class SessionServiceTest {
             return session;
         });
 
-        var session = sessionService.createSession("demo", "test session");
+        var session = sessionManagementService.createSession("demo", "test session");
 
         assertThat(session.getName()).isEqualTo("demo");
         assertThat(session.getDescription()).isEqualTo("test session");
@@ -47,7 +49,7 @@ class SessionServiceTest {
     void whenCreateSession_thenRejectsDuplicateName() {
         when(sessionRepository.findByName("demo")).thenReturn(Optional.of(new Session()));
 
-        assertThatThrownBy(() -> sessionService.createSession("demo", null))
+        assertThatThrownBy(() -> sessionManagementService.createSession("demo", null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Session name demo already exists");
 
@@ -64,7 +66,7 @@ class SessionServiceTest {
             return session;
         });
 
-        var session = sessionService.createSession(" ", null);
+        var session = sessionManagementService.createSession(" ", null);
 
         assertThat(session.getId()).isNotNull();
         assertThat(session.getName()).isEqualTo(session.getId().toString());
@@ -77,7 +79,7 @@ class SessionServiceTest {
         expected.setId(id);
         when(sessionRepository.findById(id)).thenReturn(Optional.of(expected));
 
-        var session = sessionService.getSession(id.toString());
+        var session = sessionManagementService.getSession(id.toString());
 
         assertThat(session).isSameAs(expected);
         verify(sessionRepository, never()).findByName(id.toString());
@@ -89,7 +91,7 @@ class SessionServiceTest {
         expected.setName("demo");
         when(sessionRepository.findByName("demo")).thenReturn(Optional.of(expected));
 
-        var session = sessionService.getSession("demo");
+        var session = sessionManagementService.getSession("demo");
 
         assertThat(session).isSameAs(expected);
     }
@@ -98,7 +100,7 @@ class SessionServiceTest {
     void whenGetSession_thenRejectsMissingSession() {
         when(sessionRepository.findByName("missing")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> sessionService.getSession("missing"))
+        assertThatThrownBy(() -> sessionManagementService.getSession("missing"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Session missing not found");
     }
@@ -110,7 +112,7 @@ class SessionServiceTest {
         session.setName("demo");
         when(sessionRepository.findByName("demo")).thenReturn(Optional.of(session));
 
-        var deleted = sessionService.deleteSession("demo");
+        var deleted = sessionManagementService.deleteSession("demo");
 
         assertThat(deleted).isSameAs(session);
         var captor = ArgumentCaptor.forClass(Session.class);
@@ -124,6 +126,6 @@ class SessionServiceTest {
         var second = new Session();
         when(sessionRepository.findAll()).thenReturn(List.of(first, second));
 
-        assertThat(sessionService.listSessions()).containsExactly(first, second);
+        assertThat(sessionManagementService.listSessions()).containsExactly(first, second);
     }
 }
