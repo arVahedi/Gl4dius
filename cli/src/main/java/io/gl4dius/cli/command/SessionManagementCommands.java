@@ -55,7 +55,7 @@ public class SessionManagementCommands {
     }
 
     @Command(name = "session edit", description = "Update current session")
-    public void updateSession(
+    public Session updateSession(
             @Argument(index = 0, description = "ID or Name of the session to remove (default is current session)")
             String identifier,
             @Option(longName = "name", shortName = 'n', description = "Name to session")
@@ -63,7 +63,7 @@ public class SessionManagementCommands {
             @Option(longName = "description", shortName = 'd', description = "Description of the session")
             String description
     ) {
-        this.sessionManagementService.updateSession(identifier, name, description);
+        return this.sessionManagementService.updateSession(identifier, name, description);
     }
 
     private @NonNull String formatSessions(@NonNull List<Session> sessions) {

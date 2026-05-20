@@ -91,6 +91,13 @@ public class SessionManagementService {
 
         session = this.sessionRepository.save(session);
         log.info("Updated session {}", session.getId());
+
+        Session finalSession = session;
+        Gl4diusApplication.getCurrentSession().ifPresent(currentSession -> {
+            if (currentSession.getId().equals(finalSession.getId())) {
+                Gl4diusApplication.setCurrentSession(finalSession);
+            }
+        });
         return session;
     }
 }
