@@ -48,7 +48,7 @@ public class SessionManagementService {
     public Session deleteSession(String identifier) {
         var session = this.getSession(identifier);
 
-        this.sessionExecutionService.stopSession();
+        this.sessionExecutionService.stopSession(session);
         Gl4diusApplication.getCurrentSession().ifPresent(currentSession -> {
             if (currentSession.getId().equals(session.getId())) {
                 this.sessionExecutionService.exitSession();
