@@ -25,6 +25,7 @@ public class SessionExecutionService {
     }
 
     public void exitSession() {
+        //todo: do we need to stop session here?!
         Gl4diusApplication.setCurrentSession(null);
     }
 

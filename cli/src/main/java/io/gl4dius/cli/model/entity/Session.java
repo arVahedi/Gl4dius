@@ -1,6 +1,5 @@
 package io.gl4dius.cli.model.entity;
 
-import io.gl4dius.cli.assets.AttackMode;
 import io.gl4dius.cli.model.SessionConfig;
 import jakarta.persistence.*;
 import lombok.Getter;
