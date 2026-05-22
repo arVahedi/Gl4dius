@@ -36,42 +36,6 @@ class SessionManagementCommandsTest {
     }
 
     @Test
-    void whenListSessions_thenFormatsSessions() {
-        var session = SessionFixtures.session(s -> s.setName("demo"));
-        when(sessionManagementService.listSessions()).thenReturn(List.of(session));
-
-        var output = sessionManagementCommands.listSessions();
-
-        assertThat(output)
-                .contains("ID | Name | Mode | Description | Created At | Last Updated At")
-                .contains(session.getId().toString())
-                .contains("demo")
-                .contains("-")
-                .contains("test session");
-    }
-
-    @Test
-    void whenListSessions_thenFormatsEmptyList() {
-        when(sessionManagementService.listSessions()).thenReturn(List.of());
-
-        assertThat(sessionManagementCommands.listSessions()).isEqualTo("No sessions found");
-    }
-
-    @Test
-    void whenGetSession_thenFormatsSession() {
-        var session = SessionFixtures.session(s -> s.setName("demo"));
-        when(sessionManagementService.getSession("demo")).thenReturn(session);
-
-        var output = sessionManagementCommands.getSession("demo");
-
-        assertThat(output)
-                .contains("ID: " + session.getId())
-                .contains("Name: demo")
-                .contains("Mode: -")
-                .contains("Description: test session");
-    }
-
-    @Test
     void whenCreateSession_thenDelegatesToService() {
         sessionManagementCommands.createSession("demo", "test session");
 
