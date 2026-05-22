@@ -17,5 +17,7 @@ import io.gl4dius.cli.assets.AttackMode;
 public sealed interface SessionConfig
         permits DefacingSessionConfig, SniffingSessionConfig, PhishingSessionConfig {
 
+    SessionConfig update(String key, String value);
+
     AttackMode mode();
 }
