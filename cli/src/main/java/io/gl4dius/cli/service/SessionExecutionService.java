@@ -25,12 +25,12 @@ public class SessionExecutionService {
 
         exitSession();
         Gl4diusApplication.setCurrentSession(session);
-        log.info("Switched to session {}", session.getId());
+        log.debug("Switched to session {}", session.getId());
     }
 
     public void exitSession() {
         Gl4diusApplication.getCurrentSession().ifPresent(session -> {
-            log.info("Exiting session {}", session.getId());
+            log.debug("Exiting session {}", session.getId());
             stopSession();
         });
         Gl4diusApplication.setCurrentSession(null);
@@ -47,7 +47,7 @@ public class SessionExecutionService {
     }
 
     public void stopSession(@NonNull Session session) {
-        log.info("Stopping session {}", session.getId());
+        log.debug("Stopping session {}", session.getId());
         this.daemonModuleExecutor.stop(session.getId());
     }
 }

@@ -32,13 +32,13 @@ public class SessionManagementService {
 
         session = this.sessionRepository.save(session);
 
-        log.info("Created session {}", session.getId());
+        log.debug("Created session {}", session.getId());
         if (!StringUtils.hasText(session.getName())) {
             session.setName(session.getId().toString());
             session = this.sessionRepository.save(session);
         }
 
-        log.info("Switching session to {}", session.getName());
+        log.debug("Switching session to {}", session.getName());
         this.sessionExecutionService.switchSession(session.getName());
 
         return session;
@@ -56,7 +56,7 @@ public class SessionManagementService {
         });
 
         this.sessionRepository.delete(session);
-        log.info("Deleted session {}", session.getId());
+        log.debug("Deleted session {}", session.getId());
         return session;
     }
 
@@ -90,7 +90,7 @@ public class SessionManagementService {
         }
 
         session = this.sessionRepository.save(session);
-        log.info("Updated session {}", session.getId());
+        log.debug("Updated session {}", session.getId());
 
         Session finalSession = session;
         Gl4diusApplication.getCurrentSession().ifPresent(currentSession -> {

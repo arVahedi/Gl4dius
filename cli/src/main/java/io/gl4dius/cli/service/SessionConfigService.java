@@ -38,7 +38,7 @@ public class SessionConfigService {
         session.setConfig(config);
         this.sessionRepository.save(session);
 
-        log.info("Set session {} for attacking mode {}", session.getId(), mode);
+        log.debug("Set session {} for attacking mode {}", session.getId(), mode);
     }
 
     @Transactional
@@ -55,6 +55,6 @@ public class SessionConfigService {
         session.setConfig(config);
         this.sessionRepository.save(session);
 
-        log.info("Set session {} config {} to {}", session.getId(), key, value);
+        log.debug("Set session {} config {} to {}", session.getId(), key, value);
     }
 }

@@ -1,4 +1,6 @@
 spring:
+  main:
+    banner-mode: console
   datasource:
     driver-class-name: org.sqlite.JDBC
   jpa:

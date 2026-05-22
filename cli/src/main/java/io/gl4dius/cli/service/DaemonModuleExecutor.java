@@ -43,7 +43,7 @@ public class DaemonModuleExecutor {
         this.sessionRunningDaemons.computeIfAbsent(sessionId, id -> new ArrayList<>()).add(daemon);
 
         Future<?> future = this.daemonModuleExecutorService.submit(() -> {
-            log.info("Daemon started: {}, delayInterval: {}", daemonName, delayInterval);
+            log.debug("Daemon started: {}, delayInterval: {}", daemonName, delayInterval);
             try {
                 while (!Thread.currentThread().isInterrupted()) {
                     task.run();
@@ -56,7 +56,7 @@ public class DaemonModuleExecutor {
                 Thread.currentThread().interrupt();
             } finally {
                 this.sessionRunningDaemons.remove(sessionId);
-                log.info("Daemon stopped: {}", daemonName);
+                log.debug("Daemon stopped: {}", daemonName);
             }
         });
 
@@ -75,7 +75,7 @@ public class DaemonModuleExecutor {
                 daemon.getFuture().cancel(true);
             }
 
-            log.info("Stop requested for daemon: {}, session: {}", daemon.getName(), sessionId);
+            log.debug("Stop requested for daemon: {}, session: {}", daemon.getName(), sessionId);
         });
     }
 
