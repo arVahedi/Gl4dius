@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.jline.utils.AttributedString;
+import org.jline.utils.AttributedStyle;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -19,11 +21,16 @@ public class CommandOutputRendererAspect {
     public Object render(@NonNull ProceedingJoinPoint joinPoint) throws Throwable {
         Object commandResult = joinPoint.proceed();
 
-        return switch (commandResult) {
+        var output = switch (commandResult) {
             case null -> "";
             case String stringOutput -> stringOutput;
             case Integer integerOutput -> String.valueOf(integerOutput);
             default -> this.commandOutputRenderer.render(commandResult);
         };
+
+        return new AttributedString(
+                output,
+                AttributedStyle.DEFAULT.foreground(AttributedStyle.GREEN)
+        ).toAnsi();
     }
 }

@@ -1,5 +1,6 @@
+${AnsiColor.GREEN}
 #####################################################################################################################
-                                                                                                 powered by Gl4di4tor
+                                                                                                 powered by ${AnsiColor.RED}Gl4di4tor${AnsiColor.GREEN}
                                                           dddddddd
         GGGGGGGGGGGGGlllllll       444444444              d::::::d  iiii
      GGG::::::::::::Gl:::::l      4::::::::4              d::::::d i::::i
