@@ -23,12 +23,20 @@ services:
 
   victim:
     #    image: ubuntu:26.04
-    image: gl4dius-dev:latest
+    image: linuxserver/webtop:debian-mate-version-71d1c861
     container_name: victim
     command: sleep infinity
     cap_add:
       - NET_ADMIN
       - NET_RAW
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Berlin
+    ports:
+      - "3000:3000"
+      - "5900:5900"
+    shm_size: "2gb"
     networks:
       gl4dius-lab:
         ipv4_address: 172.28.0.20

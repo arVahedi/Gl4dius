@@ -66,14 +66,4 @@ class SessionManagementServiceIT {
         assertThat(created.getName()).isEqualTo(created.getId().toString());
         assertThat(sessionManagementService.getSession(created.getId().toString()).getName()).isEqualTo(created.getName());
     }
-
-    /*@TestConfiguration
-    static class ShellRunnerTestConfiguration {
-
-        @Bean
-        ApplicationRunner springShellApplicationRunner() {
-            return args -> {
-            };
-        }
-    }*/
 }
