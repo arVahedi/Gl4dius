@@ -1,5 +1,8 @@
 package io.gl4dius.cli.model.dto.iptables;
 
+import lombok.Builder;
+
+@Builder
 public record IptablesRedirectRule(
         String inputInterface,
         int originalPort,

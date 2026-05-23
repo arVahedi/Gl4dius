@@ -1,6 +1,6 @@
-CREATE TABLE IF NOT EXISTS gl4dius_metadata
+CREATE TABLE IF NOT EXISTS preferences
 (
-    key   TEXT PRIMARY KEY,
+    key   VARCHAR(255) PRIMARY KEY,
     value TEXT NOT NULL
 );
 

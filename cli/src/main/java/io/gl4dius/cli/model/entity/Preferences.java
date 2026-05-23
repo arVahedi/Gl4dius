@@ -1,5 +1,6 @@
 package io.gl4dius.cli.model.entity;
 
+import io.gl4dius.cli.assets.PreferencesKey;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -10,12 +11,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "gl4dius_metadata")
-public class Gl4diusMetadata {
+@Table(name = "preferences")
+public class Preferences {
 
     @Id
     @Column(name = "key", nullable = false)
-    private String key;
+    private PreferencesKey key;
 
     @Column(name = "value", nullable = false)
     private String value;
