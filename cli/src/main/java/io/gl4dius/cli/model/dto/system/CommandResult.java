@@ -11,12 +11,12 @@ public record CommandResult(
         String stderr
 ) {
 
-    public boolean successful() {
+    public boolean succeeded() {
         return exitCode == 0;
     }
 
     public String requireStdout() {
-        if (!successful()) {
+        if (!succeeded()) {
             throw new SystemCommandException(this);
         }
 

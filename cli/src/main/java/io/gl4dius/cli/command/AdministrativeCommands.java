@@ -23,7 +23,7 @@ public class AdministrativeCommands {
 
     @Command(name = "cleanup", description = "Cleanup leftover system changes")
     public void cleanup() {
-        ipv4ForwardingManager.disableIpv4Forwarding();
         this.iptablesRuleManager.flushRules();
+        this.ipv4ForwardingManager.disableIpv4Forwarding();
     }
 }

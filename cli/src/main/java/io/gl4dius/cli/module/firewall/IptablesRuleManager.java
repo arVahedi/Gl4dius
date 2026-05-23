@@ -134,7 +134,7 @@ public class IptablesRuleManager {
 
     private boolean execute(List<String> command) {
         CommandResult result = commandExecutor.execute(new CommandRequest(command, IPTABLES_TIMEOUT));
-        return result.successful();
+        return result.succeeded();
     }
 
 }
