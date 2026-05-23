@@ -1,4 +1,4 @@
-package io.gl4dius.cli.model;
+package io.gl4dius.cli.model.dto.sessionconfig;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;

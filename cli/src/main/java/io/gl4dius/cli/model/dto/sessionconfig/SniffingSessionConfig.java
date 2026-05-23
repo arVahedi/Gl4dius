@@ -1,4 +1,4 @@
-package io.gl4dius.cli.model;
+package io.gl4dius.cli.model.dto.sessionconfig;
 
 import io.gl4dius.cli.assets.AttackMode;
 import org.jspecify.annotations.NonNull;

@@ -1,4 +1,4 @@
-package io.gl4dius.cli.service;
+package io.gl4dius.cli.service.session;
 
 import io.gl4dius.cli.Gl4diusApplication;
 import io.gl4dius.cli.model.entity.Session;

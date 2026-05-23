@@ -1,8 +1,9 @@
-package io.gl4dius.cli.service;
+package io.gl4dius.cli.service.session;
 
 import io.gl4dius.cli.Gl4diusApplication;
 import io.gl4dius.cli.model.entity.Session;
 import io.gl4dius.cli.repository.SessionRepository;
+import io.gl4dius.cli.service.DaemonModuleExecutor;
 import io.gl4dius.cli.utility.UuidUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

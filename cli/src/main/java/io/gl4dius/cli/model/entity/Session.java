@@ -1,6 +1,6 @@
 package io.gl4dius.cli.model.entity;
 
-import io.gl4dius.cli.model.SessionConfig;
+import io.gl4dius.cli.model.dto.sessionconfig.SessionConfig;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

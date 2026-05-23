@@ -1,10 +1,10 @@
-package io.gl4dius.cli.service;
+package io.gl4dius.cli.service.session;
 
 import io.gl4dius.cli.Gl4diusApplication;
 import io.gl4dius.cli.assets.AttackMode;
-import io.gl4dius.cli.model.DefacingSessionConfig;
-import io.gl4dius.cli.model.PhishingSessionConfig;
-import io.gl4dius.cli.model.SniffingSessionConfig;
+import io.gl4dius.cli.model.dto.sessionconfig.DefacingSessionConfig;
+import io.gl4dius.cli.model.dto.sessionconfig.PhishingSessionConfig;
+import io.gl4dius.cli.model.dto.sessionconfig.SniffingSessionConfig;
 import io.gl4dius.cli.repository.SessionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

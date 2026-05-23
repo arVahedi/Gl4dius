@@ -1,14 +1,12 @@
 package io.gl4dius.cli.command;
 
 import io.gl4dius.cli.fixture.SessionFixtures;
-import io.gl4dius.cli.service.SessionManagementService;
+import io.gl4dius.cli.service.session.SessionManagementService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;

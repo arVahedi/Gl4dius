@@ -2,6 +2,8 @@ package io.gl4dius.cli.service;
 
 import io.gl4dius.cli.model.entity.Session;
 import io.gl4dius.cli.repository.SessionRepository;
+import io.gl4dius.cli.service.session.SessionExecutionService;
+import io.gl4dius.cli.service.session.SessionManagementService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;

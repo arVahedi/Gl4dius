@@ -1,8 +1,8 @@
 package io.gl4dius.cli.command;
 
 import io.gl4dius.cli.assets.AttackMode;
-import io.gl4dius.cli.service.SessionConfigService;
-import io.gl4dius.cli.service.SessionManagementService;
+import io.gl4dius.cli.service.session.SessionConfigService;
+import io.gl4dius.cli.service.session.SessionManagementService;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
