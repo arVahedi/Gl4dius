@@ -9,7 +9,8 @@
         </encoder>
     </appender>
 
-    <logger name="io.gl4dius.cli.LinuxPrivilegeChecker" level="ERROR" additivity="false">
+<!--    <logger name="io.gl4dius.cli.LinuxPrivilegeChecker" level="ERROR" additivity="false">-->
+    <logger name="io.gl4dius.cli" level="DEBUG" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>
 

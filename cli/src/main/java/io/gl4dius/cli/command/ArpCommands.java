@@ -1,6 +1,5 @@
 package io.gl4dius.cli.command;
 
-import io.gl4dius.cli.assets.PoisoningMode;
 import io.gl4dius.cli.module.arp.ArpPoisoner;
 import io.gl4dius.cli.service.DaemonModuleExecutor;
 import lombok.RequiredArgsConstructor;
@@ -23,25 +22,22 @@ public class ArpCommands {
     public String poisoning(
             @Option(longName = "interface", shortName = 'i', required = true, description = "NIC to poison")
             String interfaceName,
-            @Option(longName = "mode", shortName = 'm', defaultValue = "BC", description = "Poisoning mode: BC=BROADCAST, TS=TARGET_SPECIFIC")
-            String mode,
-            @Option(longName = "target-ip", shortName = 't', description = "Target IP (only used in TS mode)")
+            @Option(longName = "target-ip", shortName = 't', description = "Target IP (if not specified, ALL clients in the LAN will be poisoned)")
             String targetIp,
-            @Option(longName = "target-mac", description = "Target MAC-Address (only used in TS mode)")
+            @Option(longName = "target-mac", description = "Target MAC-Address")
             String targetMac,
-            @Option(longName = "spoof", shortName = 's', required = true, description = "Spoofed IP")
+            @Option(longName = "spoof", shortName = 's', description = "Spoofed IP (default NIC gateway IP)")
             String spoofIp,
             @Option(longName = "daemon", shortName = 'd', description = "Run as Daemon", defaultValue = "false")
             boolean daemon
     ) {
-        var poisoningMode = PoisoningMode.fromAcronym(mode);
         if (daemon) {
             this.daemonModuleExecutor.execute("arp-poisoner",
-                    () -> this.arpPoisoner.poison(interfaceName, poisoningMode, spoofIp, targetIp, targetMac));
+                    () -> this.arpPoisoner.poison(interfaceName, spoofIp, targetIp, targetMac));
         } else {
-            this.arpPoisoner.poison(interfaceName, poisoningMode, spoofIp, targetIp, targetMac);
+            this.arpPoisoner.poison(interfaceName, spoofIp, targetIp, targetMac);
         }
 
-        return "ARP poisoning started on interface " + interfaceName + " with mode " + mode + " to spoof " + spoofIp;
+        return "ARP poisoning started on interface " + interfaceName + " to spoof " + spoofIp;
     }
 }
