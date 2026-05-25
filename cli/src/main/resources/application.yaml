@@ -12,7 +12,6 @@ spring:
     properties:
       hibernate:
         format_sql: false
-        show_sql: false
   flyway:
     enabled: true
     locations: classpath:db/migration
@@ -23,3 +22,9 @@ gl4dius:
       key: Gl4dius
   database:
     file-name: .gl4dius.db
+
+#logging:
+#  level:
+#    org.hibernate.SQL: DEBUG
+#    org.hibernate.orm.jdbc.bind: TRACE
+#    org.hibernate.stat: DEBUG

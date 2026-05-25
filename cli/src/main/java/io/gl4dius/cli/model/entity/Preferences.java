@@ -1,10 +1,7 @@
 package io.gl4dius.cli.model.entity;
 
 import io.gl4dius.cli.assets.PreferencesKey;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,6 +12,7 @@ import lombok.Setter;
 public class Preferences {
 
     @Id
+    @Enumerated(EnumType.STRING)
     @Column(name = "key", nullable = false)
     private PreferencesKey key;
 
