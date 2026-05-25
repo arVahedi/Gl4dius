@@ -1,6 +1,7 @@
 spring:
   main:
     banner-mode: console
+    web-application-type: none
   datasource:
     driver-class-name: org.sqlite.JDBC
   jpa:
@@ -11,6 +12,7 @@ spring:
     properties:
       hibernate:
         format_sql: false
+        show_sql: false
   flyway:
     enabled: true
     locations: classpath:db/migration

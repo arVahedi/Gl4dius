@@ -43,7 +43,11 @@ public class SessionExecutionCommands {
             @Option(longName = "gateway", shortName = 'g', description = "Gateway IP")
             String gatewayIp
     ) {
-
+        try {
+            this.sessionExecutionService.startSession(interfaceName, targetIp, targetMac, gatewayIp);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
     @Command(name = "session stop", description = "Stop current session")

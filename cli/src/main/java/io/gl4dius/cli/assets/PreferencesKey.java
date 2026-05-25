@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum PreferencesKey {
-    PROXY_SERVER_PORT("PPROT"),
+    PROXY_SERVER_PORT("PPORT"),
     WEB_SERVER_PORT("WPORT"),
     ;
 
