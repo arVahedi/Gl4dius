@@ -62,26 +62,22 @@ public class DaemonModuleExecutor {
     }
 
     public void stop(UUID sessionId) {
-        try {
-            var daemons = this.sessionRunningDaemons.remove(sessionId);
+        var daemons = this.sessionRunningDaemons.remove(sessionId);
 
-            if (daemons == null || daemons.isEmpty()) {
-                log.debug("No daemons to stop for session: {}", sessionId);
-                return;
-            }
+        if (daemons == null || daemons.isEmpty()) {
+            log.debug("No daemons to stop for session: {}", sessionId);
+            return;
+        }
 
-            synchronized (daemons) {
-                for (RunningDaemon daemon : daemons) {
-                    Future<?> future = daemon.getFuture();
-                    if (future != null) {
-                        future.cancel(true);
-                    }
-
-                    log.debug("Stop requested for daemon: {}, session: {}", daemon.getName(), sessionId);
+        synchronized (daemons) {
+            for (RunningDaemon daemon : daemons) {
+                Future<?> future = daemon.getFuture();
+                if (future != null) {
+                    future.cancel(true);
                 }
+
+                log.debug("Stop requested for daemon: {}, session: {}", daemon.getName(), sessionId);
             }
-        } catch (Exception e) {
-            log.error("Failed to stop daemons for session: {}", sessionId, e);
         }
     }
 

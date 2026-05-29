@@ -37,7 +37,7 @@ public class IptablesRuleManager {
 
     @PreDestroy
     public void destroy() {
-        flushRules();
+        purge();
     }
 
     public void addPostRoutingRule(@NonNull String nic) {
@@ -70,6 +70,11 @@ public class IptablesRuleManager {
     }
 
     public void flushRules() {
+        // Remove all rules inside your custom chain
+        executeIgnoringFailure(List.of("iptables", "-t", TABLE, "-F", GL4DIUS_CHAIN));
+    }
+
+    public void purge() {
         var deleteJumpRule = List.of("iptables", "-t", TABLE, "-D", "PREROUTING", "-j", GL4DIUS_CHAIN);
 
         // 1. Remove the jump/reference from the built-in chain

@@ -108,5 +108,7 @@ public class SessionExecutionService {
     public void stopSession(@NonNull Session session) {
         log.debug("Stopping session {}", session.getId());
         this.daemonModuleExecutor.stop(session.getId());
+        this.iptablesRuleManager.flushRules();
+        this.proxyServerEngine.stop();
     }
 }
