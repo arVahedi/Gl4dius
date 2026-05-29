@@ -1,6 +1,6 @@
 package io.gl4dius.cli.model.dto.sessionconfig;
 
-import io.gl4dius.cli.assets.AttackMode;
+import io.gl4dius.cli.assets.InterceptionMode;
 import lombok.Builder;
 import org.jspecify.annotations.NonNull;
 
@@ -25,7 +25,7 @@ public record PhishingSessionConfig(
     }
 
     @Override
-    public AttackMode mode() {
-        return AttackMode.PHISHING;
+    public InterceptionMode mode() {
+        return InterceptionMode.PHISHING;
     }
 }

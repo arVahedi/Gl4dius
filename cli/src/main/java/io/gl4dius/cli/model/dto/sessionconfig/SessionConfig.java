@@ -2,7 +2,7 @@ package io.gl4dius.cli.model.dto.sessionconfig;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import io.gl4dius.cli.assets.AttackMode;
+import io.gl4dius.cli.assets.InterceptionMode;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -19,5 +19,5 @@ public sealed interface SessionConfig
 
     SessionConfig update(String key, String value);
 
-    AttackMode mode();
+    InterceptionMode mode();
 }

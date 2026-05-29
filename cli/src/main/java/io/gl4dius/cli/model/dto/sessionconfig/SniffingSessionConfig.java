@@ -1,6 +1,6 @@
 package io.gl4dius.cli.model.dto.sessionconfig;
 
-import io.gl4dius.cli.assets.AttackMode;
+import io.gl4dius.cli.assets.InterceptionMode;
 import org.jspecify.annotations.NonNull;
 
 public record SniffingSessionConfig(
@@ -17,7 +17,7 @@ public record SniffingSessionConfig(
     }
 
     @Override
-    public AttackMode mode() {
-        return AttackMode.SNIFFING;
+    public InterceptionMode mode() {
+        return InterceptionMode.SNIFFING;
     }
 }

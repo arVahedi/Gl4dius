@@ -9,10 +9,15 @@
         </encoder>
     </appender>
 
-<!--    <logger name="io.gl4dius.cli.LinuxPrivilegeChecker" level="ERROR" additivity="false">-->
-    <logger name="io.gl4dius.cli" level="DEBUG" additivity="false">
+    <logger name="io.gl4dius.cli.service.DataDumpService" level="INFO" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>
+
+    <logger name="io.gl4dius.cli.LinuxPrivilegeChecker" level="ERROR" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <logger name="io.gl4dius.cli" level="OFF"/>
 
     <root level="OFF"/>
 </configuration>

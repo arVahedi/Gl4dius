@@ -1,15 +1,13 @@
 package io.gl4dius.cli.command;
 
-import io.gl4dius.cli.assets.PreferencesKey;
 import io.gl4dius.cli.repository.PreferencesRepository;
-import io.gl4dius.cli.service.NetDiscoveryService;
+import io.gl4dius.cli.utility.NetInterfaceUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.shell.core.command.annotation.Command;
 import org.springframework.stereotype.Component;
-import tools.jackson.databind.ObjectMapper;
 
-import java.util.Map;
+import java.util.stream.StreamSupport;
 
 @Slf4j
 @Component
@@ -21,8 +19,10 @@ public class TestCommands {
     @Command(value = "test")
     public String test() throws Exception {
         log.info("Running test command");
-        return this.preferencesRepository.findById(PreferencesKey.PROXY_SERVER_PORT)
-              .orElseThrow(() -> new IllegalArgumentException("Proxy server port has not been set"))
-              .getValue();
+        var ipv4Subnet = NetInterfaceUtil.resolveIpv4Subnet("eth0");
+
+        ipv4Subnet.hosts().forEach(System.out::println);
+
+        return StreamSupport.stream(ipv4Subnet.hosts().spliterator(), false).toList().toString();
     }
 }

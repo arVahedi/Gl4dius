@@ -8,17 +8,17 @@ import java.util.Arrays;
 
 @Getter
 @RequiredArgsConstructor
-public enum AttackMode {
+public enum InterceptionMode {
     DEFACING("def"),
     SNIFFING("sn"),
     PHISHING("ph");
 
     private final String shortName;
 
-    public static @NonNull AttackMode fromString(String value) {
-        return Arrays.stream(AttackMode.values())
+    public static @NonNull InterceptionMode fromString(String value) {
+        return Arrays.stream(InterceptionMode.values())
                 .filter(mode -> mode.getShortName().equalsIgnoreCase(value) || mode.name().equalsIgnoreCase(value))
                 .findAny()
-                .orElseThrow(() -> new IllegalArgumentException("Unknown attack mode: %s".formatted(value)));
+                .orElseThrow(() -> new IllegalArgumentException("Unknown interception mode: %s".formatted(value)));
     }
 }

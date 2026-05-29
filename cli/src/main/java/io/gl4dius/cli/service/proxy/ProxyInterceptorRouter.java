@@ -1,6 +1,6 @@
 package io.gl4dius.cli.service.proxy;
 
-import io.gl4dius.cli.assets.AttackMode;
+import io.gl4dius.cli.assets.InterceptionMode;
 import io.gl4dius.cli.service.interception.DefacingInterceptor;
 import io.gl4dius.cli.service.interception.Interceptor;
 import io.gl4dius.cli.service.interception.PhishingInterceptor;
@@ -18,7 +18,7 @@ public class ProxyInterceptorRouter {
     private final SniffingInterceptor sniffingInterceptor;
     private final PhishingInterceptor phishingInterceptor;
 
-    public Interceptor route(AttackMode mode) {
+    public Interceptor route(InterceptionMode mode) {
         return switch (mode) {
             case DEFACING -> this.defacingInterceptor;
             case SNIFFING -> this.sniffingInterceptor;

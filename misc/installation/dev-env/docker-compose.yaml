@@ -22,7 +22,6 @@ services:
         ipv4_address: 172.28.0.10
 
   victim:
-    #    image: ubuntu:26.04
     image: linuxserver/webtop:debian-mate-version-71d1c861
     container_name: victim
     command: sleep infinity

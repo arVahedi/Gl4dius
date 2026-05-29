@@ -1,6 +1,6 @@
 package io.gl4dius.cli.model.dto.sessionconfig;
 
-import io.gl4dius.cli.assets.AttackMode;
+import io.gl4dius.cli.assets.InterceptionMode;
 import io.gl4dius.cli.utility.BooleanUtil;
 import lombok.Builder;
 import org.jspecify.annotations.NonNull;
@@ -26,7 +26,7 @@ public record DefacingSessionConfig(
     }
 
     @Override
-    public AttackMode mode() {
-        return AttackMode.DEFACING;
+    public InterceptionMode mode() {
+        return InterceptionMode.DEFACING;
     }
 }

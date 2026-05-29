@@ -36,7 +36,7 @@ public class SessionExecutionCommands {
     public void startSession(
             @Option(longName = "interface", shortName = 'i', required = true, description = "NIC to poison")
             String interfaceName,
-            @Option(longName = "target-ip", shortName = 't', description = "Target IP (if not specified, ALL clients in the LAN will be attacked)")
+            @Option(longName = "target-ip", shortName = 't', description = "Target IP (if not specified, ALL clients in the LAN will be intercepted)")
             String targetIp,
             @Option(longName = "target-mac", description = "Target MAC-Address")
             String targetMac,
@@ -44,7 +44,7 @@ public class SessionExecutionCommands {
             String gatewayIp
     ) {
         try {
-            this.sessionExecutionService.startSession(interfaceName, targetIp, targetMac, gatewayIp);
+            this.sessionExecutionService.startSession(interfaceName, gatewayIp, targetIp, targetMac);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

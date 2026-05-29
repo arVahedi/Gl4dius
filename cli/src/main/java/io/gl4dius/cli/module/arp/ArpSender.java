@@ -1,5 +1,6 @@
 package io.gl4dius.cli.module.arp;
 
+import io.gl4dius.cli.model.dto.Ipv4Subnet;
 import io.gl4dius.cli.utility.NetInterfaceUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.util.concurrent.locks.LockSupport;
 
 @Slf4j
 @Component
@@ -55,6 +57,41 @@ public class ArpSender {
 
             handle.sendPacket(packet);
             log.debug("ARP reply sent: {}({}) -> {}({})", senderIp, senderMac, targetIp, targetMac);
+        }
+    }
+
+    public void sendBulkArpReply(String networkInterface,
+                                 @NonNull Ipv4Subnet ipv4Subnet, String senderMacAddress,
+                                 String targetIp, String targetMacAddress) throws Exception {
+
+        PcapNetworkInterface nif = NetInterfaceUtil.findInterface(networkInterface);
+        Inet4Address targetAddr = (Inet4Address) InetAddress.getByName(targetIp);
+        MacAddress senderMac = MacAddress.getByName(senderMacAddress);
+        MacAddress targetMac = MacAddress.getByName(targetMacAddress);
+
+        int sent = 0;
+        try (PcapHandle handle = nif.openLive(SNAP_LEN, PcapNetworkInterface.PromiscuousMode.PROMISCUOUS, TIMEOUT_MS)) {
+            for (var senderIp : ipv4Subnet.hosts()) {
+                if (targetIp.equals(senderIp)) {
+                    continue;
+                }
+
+                Inet4Address senderAddr = (Inet4Address) InetAddress.getByName(senderIp);
+
+                var packet = buildArpFrame(ArpOperation.REPLY, targetMac,
+                        senderMac, senderAddr,
+                        targetMac, targetAddr);
+
+                handle.sendPacket(packet);
+                log.debug("ARP reply sent: {}({}) -> {}({})", senderIp, senderMac, targetIp, targetMac);
+
+                sent++;
+
+                if (sent % 100 == 0) {
+                    log.debug("Sent {} ARP replies", sent);
+                    LockSupport.parkNanos(1_000_000);
+                }
+            }
         }
     }
 

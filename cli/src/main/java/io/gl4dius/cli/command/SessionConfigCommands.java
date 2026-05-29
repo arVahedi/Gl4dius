@@ -1,6 +1,6 @@
 package io.gl4dius.cli.command;
 
-import io.gl4dius.cli.assets.AttackMode;
+import io.gl4dius.cli.assets.InterceptionMode;
 import io.gl4dius.cli.service.session.SessionConfigService;
 import io.gl4dius.cli.service.session.SessionManagementService;
 import jakarta.validation.constraints.NotBlank;
@@ -22,13 +22,13 @@ public class SessionConfigCommands {
     private final SessionManagementService sessionManagementService;
     private final SessionConfigService sessionConfigService;
 
-    @Command(name = "session mode", description = "Set attack mode on current session")
+    @Command(name = "session mode", description = "Set interception mode on current session")
     public void configureMode(
-            @Argument(index = 0, description = "Attack mode")
+            @Argument(index = 0, description = "Interception mode")
             String mode
     ) {
-        var attackMode = AttackMode.fromString(mode);
-        this.sessionConfigService.configureSessionMode(attackMode);
+        var interceptionMode = InterceptionMode.fromString(mode);
+        this.sessionConfigService.configureSessionMode(interceptionMode);
     }
 
     @Command(name = "session config set", description = "Set config on current session")
@@ -48,7 +48,7 @@ public class SessionConfigCommands {
         var session = this.sessionManagementService.getSession(null);
         return session.getConfig() != null
                 ? session.getConfig()
-                : "Set session mode first by running 'session config set mode %s'"
-                .formatted(Arrays.stream(AttackMode.values()).map(AttackMode::getShortName).toList().toString());
+                : "Set session mode first by running 'session mode %s'"
+                .formatted(Arrays.stream(InterceptionMode.values()).map(InterceptionMode::getShortName).toList().toString());
     }
 }

@@ -40,6 +40,14 @@ public class IptablesRuleManager {
         flushRules();
     }
 
+    public void addPostRoutingRule(@NonNull String nic) {
+        executeOrThrow(List.of("iptables", "-t", TABLE, "-A", "POSTROUTING", "-o", nic, "-j", "MASQUERADE"));
+    }
+
+    public void addForwardRule(@NonNull String input, @NonNull String output) {
+        executeOrThrow(List.of("iptables", "-A", "FORWARD", "-i", input, "-o", output, "-j", "ACCEPT"));
+    }
+
     public void addRedirectRule(@NonNull IptablesRedirectRule rule) {
         if (redirectRuleExists(rule)) {
             return;
@@ -109,7 +117,8 @@ public class IptablesRuleManager {
         return buildRedirectRuleCommand("-A", rule);
     }
 
-    private @NonNull List<String> buildRedirectRuleCommand(String operation, @NonNull IptablesRedirectRule rule) {
+    private @NonNull List<String> buildRedirectRuleCommand(String operation,
+                                                           @NonNull IptablesRedirectRule rule) {
         return List.of(
                 "iptables",
                 "-t", TABLE,

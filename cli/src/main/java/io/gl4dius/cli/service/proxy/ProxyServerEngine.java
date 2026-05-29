@@ -24,7 +24,7 @@ public class ProxyServerEngine {
 
     public synchronized void start(String host, int port) {
         var mode = Gl4diusApplication.getCurrentSession()
-                .orElseThrow(() -> new IllegalStateException("No current session"))
+                .orElseThrow(() -> new IllegalStateException("Current session not set"))
                 .getConfig().mode();
 
         var disposableServer = HttpServer.create()

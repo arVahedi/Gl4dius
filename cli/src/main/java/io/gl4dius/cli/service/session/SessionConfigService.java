@@ -1,7 +1,7 @@
 package io.gl4dius.cli.service.session;
 
 import io.gl4dius.cli.Gl4diusApplication;
-import io.gl4dius.cli.assets.AttackMode;
+import io.gl4dius.cli.assets.InterceptionMode;
 import io.gl4dius.cli.model.dto.sessionconfig.DefacingSessionConfig;
 import io.gl4dius.cli.model.dto.sessionconfig.PhishingSessionConfig;
 import io.gl4dius.cli.model.dto.sessionconfig.SniffingSessionConfig;
@@ -24,7 +24,7 @@ public class SessionConfigService {
     private final SessionExecutionService sessionExecutionService;
 
     @Transactional
-    public void configureSessionMode(@NonNull AttackMode mode) {
+    public void configureSessionMode(@NonNull InterceptionMode mode) {
         var session = Gl4diusApplication.getCurrentSession()
                 .orElseThrow(() -> new IllegalStateException("Current session not set"));
         this.sessionExecutionService.stopSession();
@@ -38,7 +38,7 @@ public class SessionConfigService {
         session.setConfig(config);
         this.sessionRepository.save(session);
 
-        log.debug("Set session {} for attacking mode {}", session.getId(), mode);
+        log.debug("Set session {} for interception mode {}", session.getId(), mode);
     }
 
     @Transactional
@@ -49,7 +49,7 @@ public class SessionConfigService {
 
         var config = Optional.ofNullable(session.getConfig())
                 .orElseThrow(() -> new IllegalStateException("Set session mode first by running 'session config set mode %s'"
-                        .formatted(Arrays.stream(AttackMode.values()).map(AttackMode::getShortName).toList().toString())));
+                        .formatted(Arrays.stream(InterceptionMode.values()).map(InterceptionMode::getShortName).toList().toString())));
 
         config = config.update(key, value);
         session.setConfig(config);

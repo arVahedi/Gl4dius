@@ -1,5 +1,6 @@
 package io.gl4dius.cli.utility;
 
+import io.gl4dius.cli.model.dto.Ipv4Subnet;
 import lombok.experimental.UtilityClass;
 import org.jspecify.annotations.NonNull;
 import org.pcap4j.core.PcapAddress;
@@ -9,7 +10,9 @@ import org.pcap4j.core.Pcaps;
 import org.pcap4j.util.MacAddress;
 
 import java.net.Inet4Address;
-import java.net.InetAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.List;
 
 @UtilityClass
@@ -24,7 +27,7 @@ public class NetInterfaceUtil {
                 .map(PcapAddress::getAddress)
                 .filter(Inet4Address.class::isInstance)
                 .map(Inet4Address.class::cast)
-                .filter(NetInterfaceUtil::isUsableAddress)
+                .filter(Ipv4Util::isUsableAddress)
                 .toList();
 
         if (ipv4Addresses.isEmpty()) {
@@ -49,10 +52,24 @@ public class NetInterfaceUtil {
                 .orElseThrow(() -> new IllegalStateException("No MAC on interface " + nic.getName()));
     }
 
-    private static boolean isUsableAddress(@NonNull InetAddress address) {
-        return !address.isAnyLocalAddress()
-                && !address.isLoopbackAddress()
-                && !address.isLinkLocalAddress()
-                && !address.isMulticastAddress();
+    public Ipv4Subnet resolveIpv4Subnet(@NonNull String nicName) throws SocketException {
+        NetworkInterface nic = NetworkInterface.getByName(nicName);
+        List<InterfaceAddress> interfaceAddressList = nic.getInterfaceAddresses()
+                .stream()
+                .filter(interfaceAddress -> interfaceAddress.getAddress() instanceof Inet4Address)
+                .toList();
+
+        if (interfaceAddressList.size() > 1) {
+            throw new IllegalStateException("Multiple IPv4 addresses found for interface %s: %s".formatted(nicName, interfaceAddressList));
+        }
+
+        if (interfaceAddressList.isEmpty()) {
+            throw new IllegalStateException("No IPv4 address found for interface %s".formatted(nicName));
+        }
+
+        InterfaceAddress interfaceAddress = interfaceAddressList.getFirst();
+        Inet4Address ipv4 = (Inet4Address) interfaceAddress.getAddress();
+        short prefixLength = interfaceAddress.getNetworkPrefixLength();
+        return Ipv4Subnet.from(ipv4, prefixLength);
     }
 }
