@@ -50,6 +50,13 @@ public class NetDiscoveryService {
         var nic = NetInterfaceUtil.findInterface(nicName);
         var ownIP = NetInterfaceUtil.resolveIp4(nic);
         var ownMac = NetInterfaceUtil.resolveMac(nic);
+
+        Optional<String> macAddress = findNeighborMacAddress(nicName, ip);
+
+        if (macAddress.isPresent()) {
+            return macAddress;
+        }
+
         this.arpSender.sendArpRequest(nicName, ownIP.getHostAddress(), ownMac.toString(), ip);
 
         this.commandExecutor.execute(CommandRequest.of(
@@ -58,7 +65,7 @@ public class NetDiscoveryService {
         ));
 
         for (int attempt = 0; attempt < DEFAULT_ATTEMPTS; attempt++) {
-            Optional<String> macAddress = findNeighborMacAddress(nicName, ip);
+            macAddress = findNeighborMacAddress(nicName, ip);
 
             if (macAddress.isPresent()) {
                 return macAddress;

@@ -17,6 +17,10 @@
         <appender-ref ref="CONSOLE"/>
     </logger>
 
+    <logger name="io.gl4dius.cli.service.DaemonModuleExecutor" level="ERROR" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
     <logger name="io.gl4dius.cli" level="OFF"/>
 
     <root level="OFF"/>

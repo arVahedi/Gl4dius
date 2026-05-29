@@ -9,10 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -40,7 +37,9 @@ public class DaemonModuleExecutor {
         var daemon = RunningDaemon.builder()
                 .name(daemonName)
                 .build();
-        this.sessionRunningDaemons.computeIfAbsent(sessionId, id -> new ArrayList<>()).add(daemon);
+        this.sessionRunningDaemons
+                .computeIfAbsent(sessionId, id -> Collections.synchronizedList(new ArrayList<>()))
+                .add(daemon);
 
         Future<?> future = this.daemonModuleExecutorService.submit(() -> {
             log.debug("Daemon started: {}, delayInterval: {}", daemonName, delayInterval);
@@ -55,7 +54,6 @@ public class DaemonModuleExecutor {
                 log.error("Daemon failed: {}", daemonName, e);
                 Thread.currentThread().interrupt();
             } finally {
-                this.sessionRunningDaemons.remove(sessionId);
                 log.debug("Daemon stopped: {}", daemonName);
             }
         });
@@ -64,19 +62,27 @@ public class DaemonModuleExecutor {
     }
 
     public void stop(UUID sessionId) {
-        var daemons = this.sessionRunningDaemons.remove(sessionId);
+        try {
+            var daemons = this.sessionRunningDaemons.remove(sessionId);
 
-        if (daemons == null || daemons.isEmpty()) {
-            return;
-        }
-
-        daemons.forEach(daemon -> {
-            if (daemon.getFuture() != null) {
-                daemon.getFuture().cancel(true);
+            if (daemons == null || daemons.isEmpty()) {
+                log.debug("No daemons to stop for session: {}", sessionId);
+                return;
             }
 
-            log.debug("Stop requested for daemon: {}, session: {}", daemon.getName(), sessionId);
-        });
+            synchronized (daemons) {
+                for (RunningDaemon daemon : daemons) {
+                    Future<?> future = daemon.getFuture();
+                    if (future != null) {
+                        future.cancel(true);
+                    }
+
+                    log.debug("Stop requested for daemon: {}, session: {}", daemon.getName(), sessionId);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Failed to stop daemons for session: {}", sessionId, e);
+        }
     }
 
     @Getter

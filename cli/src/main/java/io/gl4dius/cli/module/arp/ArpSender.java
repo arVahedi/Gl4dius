@@ -72,6 +72,10 @@ public class ArpSender {
         int sent = 0;
         try (PcapHandle handle = nif.openLive(SNAP_LEN, PcapNetworkInterface.PromiscuousMode.PROMISCUOUS, TIMEOUT_MS)) {
             for (var senderIp : ipv4Subnet.hosts()) {
+                if (Thread.currentThread().isInterrupted()) {
+                    return;
+                }
+
                 if (targetIp.equals(senderIp)) {
                     continue;
                 }

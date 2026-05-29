@@ -21,6 +21,8 @@ import org.jspecify.annotations.NonNull;
 import org.pcap4j.core.PcapNativeException;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -85,17 +87,22 @@ public class SessionExecutionService {
         }
         String finalGatewayIp = gatewayIp;
         this.daemonModuleExecutor.execute("victim-arp-poisoner",
-                () -> this.arpPoisoner.poison(nicName, finalGatewayIp, targetIp, targetMac));
+                () -> this.arpPoisoner.poison(nicName, finalGatewayIp, targetIp, targetMac),
+                Duration.ofMillis(500));
         this.daemonModuleExecutor.execute("gateway-arp-poisoner",
-                () -> this.arpPoisoner.poison(nicName, targetIp, finalGatewayIp, null));
+                () -> this.arpPoisoner.poison(nicName, targetIp, finalGatewayIp, null),
+                Duration.ofMillis(500));
 
         log.debug("[!] Target Locked and Loaded...");
+
+        Gl4diusApplication.setCurrentSessionRunning(true);
     }
 
     public void stopSession() {
         var session = Gl4diusApplication.getCurrentSession()
                 .orElseThrow(() -> new IllegalStateException("Current session not set"));
         stopSession(session);
+        Gl4diusApplication.setCurrentSessionRunning(false);
     }
 
     public void stopSession(@NonNull Session session) {

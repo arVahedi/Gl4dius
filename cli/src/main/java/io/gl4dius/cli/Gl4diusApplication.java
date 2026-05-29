@@ -1,6 +1,7 @@
 package io.gl4dius.cli;
 
 import io.gl4dius.cli.model.entity.Session;
+import lombok.Getter;
 import lombok.Setter;
 import org.jspecify.annotations.NonNull;
 import org.springframework.boot.SpringApplication;
@@ -11,6 +12,9 @@ import java.util.Optional;
 @SpringBootApplication
 public class Gl4diusApplication {
 
+    @Getter
+    @Setter
+    private static boolean currentSessionRunning = false;
     @Setter
     private static Session currentSession;
 

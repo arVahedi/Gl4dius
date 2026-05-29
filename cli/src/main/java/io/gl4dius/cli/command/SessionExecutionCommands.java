@@ -52,5 +52,6 @@ public class SessionExecutionCommands {
 
     @Command(name = "session stop", description = "Stop current session")
     public void stopSession() {
+        this.sessionExecutionService.stopSession();
     }
 }

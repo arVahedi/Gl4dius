@@ -24,12 +24,14 @@ public class PromptConfiguration {
             builder.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.CYAN))
                     .append(this.businessConfiguration.getPromptKey());
 
+            var sessionColor = Gl4diusApplication.isCurrentSessionRunning() ? AttributedStyle.RED : AttributedStyle.MAGENTA;
+
             Gl4diusApplication.getCurrentSession()
                     .map(Session::getName)
                     .map(this::sanitizePromptPart)
                     .ifPresent(name -> builder
                             .append("[")
-                            .style(AttributedStyle.DEFAULT.foreground(AttributedStyle.RED))
+                            .style(AttributedStyle.DEFAULT.foreground(sessionColor))
                             .append(name)
                             .style(AttributedStyle.DEFAULT.foreground(AttributedStyle.CYAN))
                             .append("]"));
