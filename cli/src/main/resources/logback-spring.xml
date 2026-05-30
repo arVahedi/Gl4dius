@@ -17,10 +17,6 @@
         <appender-ref ref="CONSOLE"/>
     </logger>
 
-    <logger name="io.gl4dius.cli.module.arp" level="DEBUG" additivity="false">
-        <appender-ref ref="CONSOLE"/>
-    </logger>
-
     <logger name="io.gl4dius.cli" level="OFF"/>
 
     <root level="OFF"/>
