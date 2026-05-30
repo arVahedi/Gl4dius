@@ -18,10 +18,6 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class DataDumpService {
 
-    private static final boolean ANSI_SUPPORTED = detectAnsi();
-    private static final String CYAN = ANSI_SUPPORTED ? "\u001B[36m" : "";
-    private static final String RESET = ANSI_SUPPORTED ? "\u001B[0m" : "";
-
     public void dump(@NonNull ProxyRequest request) {
         dump(request, PromptConfiguration.DEFAULT_PROMPT_COLOR);
     }
@@ -60,14 +56,6 @@ public class DataDumpService {
             sb.append(name).append(": ").append(value).append("\n");
         });
         return sb.toString();
-    }
-
-    private static boolean detectAnsi() {
-        if (System.getenv("NO_COLOR") != null) return false;
-        if (System.console() == null) return false;
-
-        String term = System.getenv("TERM");
-        return !"dumb".equals(term);
     }
 
     private String styleMessage(String message, int color) {
