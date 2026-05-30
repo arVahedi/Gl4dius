@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import reactor.netty.DisposableServer;
 import reactor.netty.http.server.HttpServer;
+import reactor.netty.http.server.HttpServerResponse;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -66,11 +67,9 @@ public class ProxyServerEngine {
         return serverRef.get() != null;
     }
 
-    private @NonNull Mono<Void> writeResponse(
-            reactor.netty.http.server.@NonNull HttpServerResponse response,
-            @NonNull ProxyResponse proxyResponse) {
+    private @NonNull Mono<Void> writeResponse(@NonNull HttpServerResponse response, @NonNull ProxyResponse proxyResponse) {
         response.status(proxyResponse.status());
-        proxyResponse.headers().forEach(response::header);
+        proxyResponse.headers().forEach(header -> response.header(header.getKey(), header.getValue()));
         return response.sendByteArray(Mono.just(proxyResponse.body())).then();
     }
 }

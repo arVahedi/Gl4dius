@@ -19,5 +19,7 @@ public sealed interface SessionConfig
 
     SessionConfig update(String key, String value);
 
+    void validate();
+
     InterceptionMode mode();
 }

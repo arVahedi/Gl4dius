@@ -17,6 +17,11 @@ public record SniffingSessionConfig(
     }
 
     @Override
+    public void validate() {
+        // There is nothing to validate
+    }
+
+    @Override
     public InterceptionMode mode() {
         return InterceptionMode.SNIFFING;
     }

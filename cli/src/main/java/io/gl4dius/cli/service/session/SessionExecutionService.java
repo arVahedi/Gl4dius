@@ -63,6 +63,15 @@ public class SessionExecutionService {
         //    - Set Iptables rules
         //    - Starting ARP Poisoning
 
+        var sessionConfig = Gl4diusApplication.getCurrentSession()
+                .orElseThrow(() -> new IllegalStateException("Current session not set"))
+                .getConfig();
+
+        if (sessionConfig == null) {
+            throw new IllegalStateException("Session config not set");
+        }
+        sessionConfig.validate();
+
         var proxyPort = this.preferencesRepository.findById(PreferencesKey.PROXY_SERVER_PORT)
                 .orElseThrow(() -> new IllegalArgumentException("Proxy server port has not been set"))
                 .getValue();
