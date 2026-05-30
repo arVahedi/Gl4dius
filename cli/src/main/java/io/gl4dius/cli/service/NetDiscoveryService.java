@@ -6,6 +6,8 @@ import io.gl4dius.cli.module.arp.ArpSender;
 import io.gl4dius.cli.utility.NetInterfaceUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -23,15 +25,16 @@ public class NetDiscoveryService {
     private static final Pattern MAC_ADDRESS_PATTERN = Pattern.compile("(?i)\\b([0-9a-f]{2}:){5}[0-9a-f]{2}\\b");
 
     private final SystemCommandExecutor commandExecutor;
-    private final ArpSender arpSender;
+    private ArpSender arpSender;
 
     public Optional<String> findDefaultGateway(String nic) {
         CommandResult result = commandExecutor.execute(CommandRequest.of(
-                Duration.ofSeconds(1),
+                Duration.ofMillis(100),
                 "ip", "route", "show", "default", "dev", nic
         ));
 
         if (!result.succeeded() || result.stdout().isBlank()) {
+            log.debug("NetDiscovery Could not find default gateway for nic {}", nic);
             return Optional.empty();
         }
 
@@ -43,6 +46,7 @@ public class NetDiscoveryService {
             }
         }
 
+        log.debug("NetDiscovery Could not find default gateway for nic {}", nic);
         return Optional.empty();
     }
 
@@ -54,13 +58,14 @@ public class NetDiscoveryService {
         Optional<String> macAddress = findNeighborMacAddress(nicName, ip);
 
         if (macAddress.isPresent()) {
+            log.debug("NetDiscovery Resolved neighbor mac address: {} for IP {}", macAddress, ip);
             return macAddress;
         }
 
         this.arpSender.sendArpRequest(nicName, ownIP.getHostAddress(), ownMac.toString(), ip);
 
         this.commandExecutor.execute(CommandRequest.of(
-                Duration.ofSeconds(1),
+                Duration.ofMillis(100),
                 "ping", "-c", "1", ip
         ));
 
@@ -68,18 +73,20 @@ public class NetDiscoveryService {
             macAddress = findNeighborMacAddress(nicName, ip);
 
             if (macAddress.isPresent()) {
+                log.debug("NetDiscovery Resolved neighbor mac address: {} for IP {} (attempt: {})", macAddress, ip, attempt + 1);
                 return macAddress;
             }
 
             Thread.sleep(DEFAULT_RETRY_DELAY);
         }
 
+        log.debug("NetDiscovery Could not find neighbor mac address for nic {} and IP {}", nicName, ip);
         return Optional.empty();
     }
 
     private Optional<String> findNeighborMacAddress(String nic, String ipAddress) {
         CommandResult result = commandExecutor.execute(CommandRequest.of(
-                Duration.ofSeconds(1),
+                Duration.ofMillis(100),
                 "ip", "neigh", "show", ipAddress, "dev", nic
         ));
 
@@ -99,5 +106,11 @@ public class NetDiscoveryService {
         }
 
         return Optional.empty();
+    }
+
+    @Autowired
+    @Lazy
+    public void setArpSender(ArpSender arpSender) {
+        this.arpSender = arpSender;
     }
 }

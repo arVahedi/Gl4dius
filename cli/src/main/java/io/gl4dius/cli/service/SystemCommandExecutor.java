@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import java.util.concurrent.*;
 
 @Slf4j
@@ -36,7 +37,8 @@ public class SystemCommandExecutor implements AutoCloseable {
 
             if (!finished) {
                 process.destroyForcibly();
-                throw new IllegalStateException("Command timed out: " + String.join(" ", request.command()));
+                log.debug("Command timed out: {}", String.join(" ", request.command()));
+                return new CommandResult(request.command(), CommandResult.EXIT_TIMEOUT, "", "");
             }
 
             return new CommandResult(

@@ -11,6 +11,9 @@ public record CommandResult(
         String stderr
 ) {
 
+    public static final int EXIT_TIMEOUT = -1;
+    public static final int EXIT_INTERRUPTED = -2;
+
     public boolean succeeded() {
         return exitCode == 0;
     }
