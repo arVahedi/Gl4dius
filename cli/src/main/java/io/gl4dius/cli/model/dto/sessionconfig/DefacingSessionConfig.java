@@ -21,8 +21,8 @@ public record DefacingSessionConfig(
     public @NonNull DefacingSessionConfig update(@NonNull String key, String value) {
         return switch (key.toLowerCase()) {
             case "template" -> {
-                if (!Files.exists(Path.of(this.template))) {
-                    throw new IllegalArgumentException("Template file does not exist: %s".formatted(this.template));
+                if (!Files.exists(Path.of(value))) {
+                    throw new IllegalArgumentException("Template file does not exist: %s".formatted(value));
                 }
                 yield DefacingSessionConfig.builder().template(value).verbose(this.verbose).build();
             }

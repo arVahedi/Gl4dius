@@ -33,7 +33,6 @@ public class DefacingInterceptor implements Interceptor {
             String html = Files.readString(normalized, StandardCharsets.UTF_8);
             return ProxyResponse.html(html);
         });
-
     }
 
     public Mono<ProxyResponse> intercept(ProxyRequest request) {

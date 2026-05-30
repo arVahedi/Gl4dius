@@ -22,8 +22,8 @@ public record PhishingSessionConfig(
         return switch (key.toLowerCase()) {
             case "domain" -> PhishingSessionConfig.builder().template(this.template).domain(value).build();
             case "template" -> {
-                if (!Files.exists(Path.of(this.template))) {
-                    throw new IllegalArgumentException("Template file does not exist: %s".formatted(this.template));
+                if (!Files.exists(Path.of(value))) {
+                    throw new IllegalArgumentException("Template file does not exist: %s".formatted(value));
                 }
                 yield PhishingSessionConfig.builder().template(value).domain(this.domain).build();
             }
