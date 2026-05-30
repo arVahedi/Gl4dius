@@ -14,6 +14,8 @@ import org.springframework.shell.jline.PromptProvider;
 @RequiredArgsConstructor
 public class PromptConfiguration {
 
+    public static final int DEFAULT_PROMPT_COLOR = AttributedStyle.GREEN;
+
     private final BusinessConfiguration businessConfiguration;
 
     @Bean
@@ -21,7 +23,7 @@ public class PromptConfiguration {
         return () -> {
             AttributedStringBuilder builder = new AttributedStringBuilder();
 
-            builder.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.CYAN))
+            builder.style(AttributedStyle.DEFAULT.foreground(DEFAULT_PROMPT_COLOR))
                     .append(this.businessConfiguration.getPromptKey());
 
             var sessionColor = Gl4diusApplication.isCurrentSessionRunning() ? AttributedStyle.RED : AttributedStyle.MAGENTA;
@@ -33,10 +35,10 @@ public class PromptConfiguration {
                             .append("[")
                             .style(AttributedStyle.DEFAULT.foreground(sessionColor))
                             .append(name)
-                            .style(AttributedStyle.DEFAULT.foreground(AttributedStyle.CYAN))
+                            .style(AttributedStyle.DEFAULT.foreground(DEFAULT_PROMPT_COLOR))
                             .append("]"));
 
-            builder.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.CYAN))
+            builder.style(AttributedStyle.DEFAULT.foreground(DEFAULT_PROMPT_COLOR))
                     .append(":> ");
 
             return builder.toAttributedString();

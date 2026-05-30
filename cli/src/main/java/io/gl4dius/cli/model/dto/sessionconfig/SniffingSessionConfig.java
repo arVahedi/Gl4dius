@@ -13,7 +13,7 @@ public record SniffingSessionConfig(
 
     @Override
     public SessionConfig update(String key, String value) {
-        return null;
+        return this;
     }
 
     @Override

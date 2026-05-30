@@ -7,6 +7,7 @@ import io.gl4dius.cli.service.interception.PhishingInterceptor;
 import io.gl4dius.cli.service.interception.SniffingInterceptor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -18,7 +19,7 @@ public class ProxyInterceptorRouter {
     private final SniffingInterceptor sniffingInterceptor;
     private final PhishingInterceptor phishingInterceptor;
 
-    public Interceptor route(InterceptionMode mode) {
+    public Interceptor route(@NonNull InterceptionMode mode) {
         return switch (mode) {
             case DEFACING -> this.defacingInterceptor;
             case SNIFFING -> this.sniffingInterceptor;

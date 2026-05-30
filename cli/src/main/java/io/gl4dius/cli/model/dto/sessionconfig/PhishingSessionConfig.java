@@ -1,6 +1,7 @@
 package io.gl4dius.cli.model.dto.sessionconfig;
 
 import io.gl4dius.cli.assets.InterceptionMode;
+import io.gl4dius.cli.utility.BooleanUtil;
 import lombok.Builder;
 import org.jspecify.annotations.NonNull;
 
@@ -10,22 +11,26 @@ import java.nio.file.Path;
 @Builder
 public record PhishingSessionConfig(
         String domain,
-        String template
+        String template,
+        boolean verbose
 ) implements SessionConfig {
 
     public static @NonNull PhishingSessionConfig empty() {
-        return new PhishingSessionConfig(null, null);
+        return new PhishingSessionConfig(null, null, false);
     }
 
     @Override
     public SessionConfig update(@NonNull String key, String value) {
         return switch (key.toLowerCase()) {
-            case "domain" -> PhishingSessionConfig.builder().template(this.template).domain(value).build();
+            case "domain" ->
+                    PhishingSessionConfig.builder().template(this.template).verbose(this.verbose).domain(value).build();
+            case "verbose" ->
+                    PhishingSessionConfig.builder().template(this.template).domain(this.domain).verbose(BooleanUtil.parseBoolean(value)).build();
             case "template" -> {
                 if (!Files.exists(Path.of(value))) {
                     throw new IllegalArgumentException("Template file does not exist: %s".formatted(value));
                 }
-                yield PhishingSessionConfig.builder().template(value).domain(this.domain).build();
+                yield PhishingSessionConfig.builder().template(value).domain(this.domain).verbose(this.verbose).build();
             }
             default ->
                     throw new IllegalArgumentException("Unknown config key: %s for mode: %s".formatted(key, this.mode()));
