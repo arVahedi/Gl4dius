@@ -23,7 +23,7 @@ public class SessionConfigCommands {
     private final SessionConfigService sessionConfigService;
 
     @Command(name = "session mode", description = "Set interception mode on current session")
-    public void configureMode(
+    public void configureSessionMode(
             @Argument(index = 0, description = "Interception mode")
             String mode
     ) {
@@ -44,7 +44,7 @@ public class SessionConfigCommands {
     }
 
     @Command(name = "session config show", description = "Show current session configuration")
-    public Object showConfig() {
+    public Object showSessionConfig() {
         var session = this.sessionManagementService.getSession(null);
         return session.getConfig() != null
                 ? session.getConfig()
