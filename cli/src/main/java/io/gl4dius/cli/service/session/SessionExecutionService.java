@@ -1,10 +1,12 @@
 package io.gl4dius.cli.service.session;
 
 import io.gl4dius.cli.Gl4diusApplication;
-import io.gl4dius.cli.assets.InterceptionMode;
 import io.gl4dius.cli.assets.PreferencesKey;
 import io.gl4dius.cli.exception.GatewayDetectionException;
 import io.gl4dius.cli.model.dto.iptables.IptablesRedirectRule;
+import io.gl4dius.cli.model.dto.proxy.ProxyServerRuntimeConfig;
+import io.gl4dius.cli.model.dto.sessionconfig.DefacingSessionConfig;
+import io.gl4dius.cli.model.dto.sessionconfig.PhishingSessionConfig;
 import io.gl4dius.cli.model.entity.Session;
 import io.gl4dius.cli.module.arp.ArpPoisoner;
 import io.gl4dius.cli.module.firewall.IptablesRuleManager;
@@ -24,6 +26,8 @@ import org.pcap4j.core.PcapNativeException;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+
+import static io.gl4dius.cli.assets.InterceptionMode.DEFACING;
 
 @Slf4j
 @Service
@@ -75,20 +79,29 @@ public class SessionExecutionService {
         }
         sessionConfig.validate();
 
+        var templatePath = switch (sessionConfig.mode()) {
+            case DEFACING -> ((DefacingSessionConfig) sessionConfig).template();
+            case PHISHING -> ((PhishingSessionConfig) sessionConfig).template();
+            default -> null;
+        };
+
         var nic = NetInterfaceUtil.findInterface(nicName);
         var interfaceIP = NetInterfaceUtil.resolveIp4(nic);
 
         var proxyPort = this.preferencesRepository.findById(PreferencesKey.PROXY_SERVER_PORT)
                 .orElseThrow(() -> new IllegalArgumentException("Proxy server port has not been set"))
                 .getValue();
-        this.proxyServerEngine.start(interfaceIP.getHostAddress(), Integer.parseInt(proxyPort));
-
-        if (sessionConfig.mode() == InterceptionMode.DEFACING || sessionConfig.mode() == InterceptionMode.PHISHING) {
-            var webServerPort = this.preferencesRepository.findById(PreferencesKey.WEB_SERVER_PORT)
-                    .orElseThrow(() -> new IllegalArgumentException("WebServer server port has not been set"))
-                    .getValue();
-            this.webServerEngine.start(interfaceIP.getHostAddress(), Integer.parseInt(webServerPort));
-        }
+        var staticResourceUri = this.preferencesRepository.findById(PreferencesKey.STATIC_RESOURCE_URI)
+                .orElseThrow(() -> new IllegalArgumentException("Static Resource URI has not been set"))
+                .getValue();
+        var proxyServerRuntimeConfig = ProxyServerRuntimeConfig.builder()
+                .host(interfaceIP.getHostAddress())
+                .port(Integer.parseInt(proxyPort))
+                .staticResourceIdentifier(staticResourceUri)
+                .interceptionMode(sessionConfig.mode())
+                .templatePath(templatePath)
+                .build();
+        this.proxyServerEngine.start(proxyServerRuntimeConfig);
 
         this.ipv4ForwardingManager.enableIpv4Forwarding();
         this.iptablesRuleManager.addPostRoutingRule(nicName);
@@ -101,7 +114,7 @@ public class SessionExecutionService {
                 .destinationPort(Integer.parseInt(proxyPort))
                 .build());
 
-        if (sessionConfig.mode() == InterceptionMode.DEFACING) {
+        if (sessionConfig.mode() == DEFACING) {
             this.iptablesRuleManager.addRedirectRule(IptablesRedirectRule.builder()
                     .inputInterface(nicName)
                     .originalPort(443)

@@ -11,6 +11,7 @@ import java.util.Arrays;
 public enum PreferencesKey {
     PROXY_SERVER_PORT("PPORT"),
     WEB_SERVER_PORT("WPORT"),
+    STATIC_RESOURCE_URI("SRU")
     ;
 
     private final String acronym;

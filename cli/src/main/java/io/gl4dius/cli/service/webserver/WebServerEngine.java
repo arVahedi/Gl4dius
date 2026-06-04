@@ -37,7 +37,7 @@ public class WebServerEngine {
                 .host(host)
                 .port(port)
                 .handle((request, response) ->
-                        this.webResourceService.serve(request, response, templatePath)
+                        this.webResourceService.serve(request, response, templatePath, "")
                 )
                 .bindNow();
 

@@ -67,32 +67,40 @@ public class WebResourceService {
 
     public Mono<Void> serve(@NonNull HttpServerRequest request,
                             @NonNull HttpServerResponse response,
-                            @NonNull String templatePath) {
+                            @NonNull String templatePath,
+                            @NonNull String staticResourceIdentifier) {
 
         if (!request.method().name().equals("GET") && !request.method().name().equals("HEAD")) {
             return response.status(HttpResponseStatus.METHOD_NOT_ALLOWED).send();
         }
 
-        return Mono.fromCallable(() -> resolveRequestedFile(request, templatePath))
+        return Mono.fromCallable(() -> resolveRequestedFile(request, templatePath, staticResourceIdentifier))
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMap(resource -> writeResource(response, request, resource))
-                .onErrorResume(StaticResourceException.class, ex ->
-                        response.status(ex.getStatus()).send())
-                .onErrorResume(ex -> response.status(HttpResponseStatus.INTERNAL_SERVER_ERROR).send());
+                .onErrorResume(StaticResourceException.class, ex -> {
+                    log.debug("Static resource exception: {}", ex.getMessage());
+                    return response.status(ex.getStatus()).send();
+                })
+                .onErrorResume(ex -> {
+                    log.debug("Error serving static resource", ex);
+                    return response.status(HttpResponseStatus.INTERNAL_SERVER_ERROR).send();
+                });
     }
 
-    private @NonNull StaticResource resolveRequestedFile(@NonNull HttpServerRequest request, @NonNull String templatePath) throws IOException {
+    private @NonNull StaticResource resolveRequestedFile(@NonNull HttpServerRequest request,
+                                                         @NonNull String templatePath,
+                                                         @NonNull String staticResourceIdentifier) throws IOException {
         var templateResourcePath = getTemplateResourceDirectoryPath(templatePath);
         String requestedPath = request.path();
         if (requestedPath.isBlank()) {
             throw new StaticResourceException(HttpResponseStatus.NOT_FOUND, "Not found");
         }
-        if (requestedPath.startsWith("/resources/")) {
-            requestedPath = requestedPath.replaceFirst("/resources/", "/");
-        }
+        requestedPath = requestedPath.replaceFirst("/?" + staticResourceIdentifier, "");
+        requestedPath = requestedPath.replaceFirst("^/resources/", "");
+
         requestedPath = decodePath(requestedPath);
         if (containsSuspiciousPathSequence(requestedPath)) {
-            throw new StaticResourceException(HttpResponseStatus.FORBIDDEN, "Forbidden");
+            throw new StaticResourceException(HttpResponseStatus.FORBIDDEN, "request path contains suspicious sequence");
         }
 
         Path candidate = templateResourcePath.resolve(requestedPath).normalize();
@@ -101,7 +109,7 @@ public class WebResourceService {
         }
 
         if (!isAllowedFile(candidate, templatePath)) {
-            throw new StaticResourceException(HttpResponseStatus.FORBIDDEN, "Forbidden");
+            throw new StaticResourceException(HttpResponseStatus.FORBIDDEN, "File is not allowed");
         }
 
         String extension = extensionOf(candidate);
@@ -147,32 +155,39 @@ public class WebResourceService {
                 || normalized.contains("/..")
                 || normalized.equals("..")
                 || normalized.startsWith("/")
+                || normalized.matches("^[a-zA-Z]:/.*")
                 || normalized.contains("\0");
     }
 
     private boolean isAllowedFile(Path file, @NonNull String templatePath) throws IOException {
         if (!Files.exists(file, LinkOption.NOFOLLOW_LINKS)) {
+            log.debug("File does not exist: {}", file);
             return false;
         }
 
         if (Files.isSymbolicLink(file)) {
+            log.debug("File is a symbolic link: {}", file);
             return false;
         }
 
         if (!Files.isRegularFile(file, LinkOption.NOFOLLOW_LINKS)) {
+            log.debug("File is not a regular file: {}", file);
             return false;
         }
 
         if (containsDotFileSegment(file)) {
+            log.debug("File contains a dot file segment: {}", file);
             return false;
         }
 
         String extension = extensionOf(file);
         if (extension.isBlank()) {
+            log.debug("File has no extension: {}", file);
             return false;
         }
 
         if (!ALLOWED_EXTENSIONS.contains(extension)) {
+            log.debug("File has an unallowed extension: {} - {}", file, extension);
             return false;
         }
 
@@ -189,10 +204,12 @@ public class WebResourceService {
         Path realFile = file.toRealPath(LinkOption.NOFOLLOW_LINKS)
                 .normalize();
         if (!realFile.startsWith(realRoot)) {
+            log.debug("File is outside of the template root: {} - real file path: {}, root file path: {}", file, realFile, realRoot);
             return false;
         }
 
         long size = Files.size(file);
+        log.debug("File size: {} bytes", size);
         return size <= MAX_FILE_SIZE_BYTES;
     }
 

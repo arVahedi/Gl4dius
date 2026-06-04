@@ -1,8 +1,10 @@
 package io.gl4dius.cli.service.proxy;
 
-import io.gl4dius.cli.Gl4diusApplication;
 import io.gl4dius.cli.model.dto.proxy.ProxyRequest;
 import io.gl4dius.cli.model.dto.proxy.ProxyResponse;
+import io.gl4dius.cli.model.dto.proxy.ProxyServerRuntimeConfig;
+import io.gl4dius.cli.service.webserver.WebResourceService;
+import io.micrometer.common.util.StringUtils;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,23 +23,28 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ProxyServerEngine {
 
     private final ProxyInterceptorRouter router;
+    private final WebResourceService webResourceService;
     private final AtomicReference<DisposableServer> serverRef = new AtomicReference<>();
 
-    public synchronized void start(String host, int port) {
-        log.debug("Starting proxy server on {}:{}", host, port);
-        var mode = Gl4diusApplication.getCurrentSession()
-                .orElseThrow(() -> new IllegalStateException("Current session not set"))
-                .getConfig().mode();
+    public synchronized void start(@NonNull ProxyServerRuntimeConfig config) {
+        log.debug("Starting proxy server on {}:{}", config.host(), config.port());
 
         var disposableServer = HttpServer.create()
-                .host(host)
-                .port(port)
+                .host(config.host())
+                .port(config.port())
                 .handle((request, response) ->
                         request.receive()
                                 .aggregate()
                                 .asByteArray()
                                 .defaultIfEmpty(new byte[0])
                                 .flatMap(body -> {
+
+                                    if ((request.uri().toLowerCase().startsWith("/" + config.staticResourceIdentifier().toLowerCase())
+                                            || request.uri().toLowerCase().startsWith(config.staticResourceIdentifier().toLowerCase()))
+                                            && StringUtils.isNotBlank(config.templatePath())) {
+                                        return this.webResourceService.serve(request, response, config.templatePath(), config.staticResourceIdentifier());
+                                    }
+
                                     var proxyRequest = ProxyRequest.builder()
                                             .method(request.method())
                                             .uri(request.uri())
@@ -47,7 +54,7 @@ public class ProxyServerEngine {
                                             .body(body)
                                             .build();
 
-                                    var interceptor = this.router.route(mode);
+                                    var interceptor = this.router.route(config.interceptionMode());
                                     return interceptor.intercept(proxyRequest)
                                             .flatMap(proxyResponse -> writeResponse(response, proxyResponse));
                                 })
