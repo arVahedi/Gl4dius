@@ -18,10 +18,6 @@
         <appender-ref ref="CONSOLE"/>
     </logger>
 
-    <logger name="io.gl4dius.cli.service.webserver.WebResourceService" level="DEBUG" additivity="false">
-        <appender-ref ref="CONSOLE"/>
-    </logger>
-
     <logger name="io.gl4dius.cli" level="OFF"/>
 
     <root level="OFF"/>
