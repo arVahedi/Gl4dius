@@ -24,6 +24,7 @@ public class ProxyServerEngine {
     private final AtomicReference<DisposableServer> serverRef = new AtomicReference<>();
 
     public synchronized void start(String host, int port) {
+        log.debug("Starting proxy server on {}:{}", host, port);
         var mode = Gl4diusApplication.getCurrentSession()
                 .orElseThrow(() -> new IllegalStateException("Current session not set"))
                 .getConfig().mode();
@@ -57,14 +58,14 @@ public class ProxyServerEngine {
     }
 
     public synchronized void stop() {
-        DisposableServer server = serverRef.getAndSet(null);
+        DisposableServer server = this.serverRef.getAndSet(null);
         if (server != null) {
             server.disposeNow();
         }
     }
 
     public boolean isRunning() {
-        return serverRef.get() != null;
+        return this.serverRef.get() != null;
     }
 
     private @NonNull Mono<Void> writeResponse(@NonNull HttpServerResponse response, @NonNull ProxyResponse proxyResponse) {

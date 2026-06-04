@@ -16,7 +16,15 @@ public record ProxyResponse(
     public static @NonNull ProxyResponse of(@NonNull String html, String contentType) {
         return new ProxyResponse(
                 HttpResponseStatus.OK,
-                new DefaultHttpHeaders().add(HttpHeaderNames.CONTENT_TYPE, contentType),
+                new DefaultHttpHeaders()
+                        .add(HttpHeaderNames.CONTENT_TYPE, contentType)
+                        .add("X-Content-Type-Options", "nosniff")
+                        .add("Cache-Control", "no-store")
+                        .add("Pragma", "no-cache")
+                        .add("Access-Control-Allow-Credentials", "true")
+                        .add("Access-Control-Allow-Origin", "*")
+                        .add("Vary", "Origin")
+                        .add("Access-Control-Allow-Private-Network", "true"),
                 html.getBytes(java.nio.charset.StandardCharsets.UTF_8)
         );
     }

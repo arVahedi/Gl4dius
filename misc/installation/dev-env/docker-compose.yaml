@@ -10,6 +10,8 @@ services:
     working_dir: /app
     volumes:
       - ./cli/target:/app
+      - ./misc/installation/dev-env/template:/home/gl4dius/template/
+      - ./misc/installation/dev-env/.gl4dius.db:/home/gl4dius/.gl4dius.db
     cap_add:
       - NET_ADMIN
       - NET_RAW
