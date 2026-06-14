@@ -24,42 +24,44 @@ public class ReverseProxyService {
 
     private final HttpClient httpClient = HttpClient.create().followRedirect(false);
 
-    public Mono<ProxyResponse> forwardRequest(ProxyRequest request, boolean enableSslStriping) {
-        String targetUrl = resolveTargetUrl(request);
+    public Mono<ProxyResponse> forwardRequest(ProxyRequest request, boolean enableSslStripping) {
+        return Mono.defer(() -> {
+                    String targetUrl = resolveTargetUrl(request);
 
-        return this.httpClient
-                .headers(outgoingHeaders -> {
-                    request.headers().forEach(entry -> {
-                        String name = entry.getKey();
-                        String value = entry.getValue();
-                        if (!HttpHeaderUtil.isHopByHopHeader(name)) {
-                            outgoingHeaders.set(name, value);
-                        }
-                    });
-                    outgoingHeaders.remove(HttpHeaderNames.HOST);
+                    return this.httpClient
+                            .headers(outgoingHeaders -> {
+                                request.headers().forEach(entry -> {
+                                    String name = entry.getKey();
+                                    String value = entry.getValue();
+                                    if (!HttpHeaderUtil.isHopByHopHeader(name)) {
+                                        outgoingHeaders.set(name, value);
+                                    }
+                                });
+                                outgoingHeaders.remove(HttpHeaderNames.HOST);
+                            })
+                            .request(request.method())
+                            .uri(targetUrl)
+                            .send(Mono.just(Unpooled.wrappedBuffer(request.body())))
+                            .responseSingle((originResponse, body) ->
+                                    body.asByteArray()
+                                            .defaultIfEmpty(new byte[0])
+                                            .map(responseBody -> {
+                                                var headers = new DefaultHttpHeaders();
+                                                originResponse.responseHeaders().forEach(entry -> {
+                                                    if (!HttpHeaderUtil.isHopByHopHeader(entry.getKey())
+                                                            && !HttpHeaderUtil.isHSTS(entry.getKey())) {
+                                                        headers.add(entry.getKey(), entry.getValue());
+                                                    }
+                                                });
+
+                                                return new ProxyResponse(
+                                                        originResponse.status(),
+                                                        headers,
+                                                        responseBody
+                                                );
+                                            })
+                            );
                 })
-                .request(request.method())
-                .uri(targetUrl)
-                .send(Mono.just(Unpooled.wrappedBuffer(request.body())))
-                .responseSingle((originResponse, body) ->
-                        body.asByteArray()
-                                .defaultIfEmpty(new byte[0])
-                                .map(responseBody -> {
-                                    var headers = new DefaultHttpHeaders();
-                                    originResponse.responseHeaders().forEach(entry -> {
-                                        if (!HttpHeaderUtil.isHopByHopHeader(entry.getKey())
-                                                && !HttpHeaderUtil.isHSTS(entry.getKey())) {
-                                            headers.add(entry.getKey(), entry.getValue());
-                                        }
-                                    });
-
-                                    return new ProxyResponse(
-                                            originResponse.status(),
-                                            headers,
-                                            responseBody
-                                    );
-                                })
-                )
                 .onErrorResume(ex -> Mono.just(new ProxyResponse(
                         HttpResponseStatus.BAD_GATEWAY,
                         new DefaultHttpHeaders().add(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.TEXT_PLAIN + "; charset=UTF-8"),
@@ -69,7 +71,7 @@ public class ReverseProxyService {
 
     private @NonNull String resolveTargetUrl(@NonNull ProxyRequest request) {
         String uri = request.uri();
-        if (uri.startsWith("http://")) {
+        if (uri.startsWith("http://") || uri.startsWith("https://")) {
             return uri;
         }
 
