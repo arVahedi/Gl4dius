@@ -19,6 +19,7 @@ public class WebServerEngine {
     private final WebResourceService webResourceService;
     private final AtomicReference<DisposableServer> serverRef = new AtomicReference<>();
 
+    @Deprecated(forRemoval = true)
     public synchronized void start(String host, int port) {
         log.debug("Starting web server on {}:{}", host, port);
 
