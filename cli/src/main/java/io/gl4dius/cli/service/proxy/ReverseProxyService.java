@@ -24,7 +24,7 @@ public class ReverseProxyService {
 
     private final HttpClient httpClient = HttpClient.create().followRedirect(false);
 
-    public Mono<ProxyResponse> forwardRequest(ProxyRequest request) {
+    public Mono<ProxyResponse> forwardRequest(ProxyRequest request, boolean enableSslStriping) {
         String targetUrl = resolveTargetUrl(request);
 
         return this.httpClient
@@ -47,7 +47,8 @@ public class ReverseProxyService {
                                 .map(responseBody -> {
                                     var headers = new DefaultHttpHeaders();
                                     originResponse.responseHeaders().forEach(entry -> {
-                                        if (!HttpHeaderUtil.isHopByHopHeader(entry.getKey())) {
+                                        if (!HttpHeaderUtil.isHopByHopHeader(entry.getKey())
+                                                && !HttpHeaderUtil.isHSTS(entry.getKey())) {
                                             headers.add(entry.getKey(), entry.getValue());
                                         }
                                     });

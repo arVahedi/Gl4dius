@@ -1,7 +1,9 @@
 package io.gl4dius.cli.service.interception;
 
+import io.gl4dius.cli.Gl4diusApplication;
 import io.gl4dius.cli.model.dto.proxy.ProxyRequest;
 import io.gl4dius.cli.model.dto.proxy.ProxyResponse;
+import io.gl4dius.cli.model.dto.sessionconfig.SniffingSessionConfig;
 import io.gl4dius.cli.service.DataDumpService;
 import io.gl4dius.cli.service.proxy.ReverseProxyService;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +24,15 @@ public class SniffingInterceptor implements Interceptor {
     public Mono<ProxyResponse> intercept(ProxyRequest request) {
         this.dataDumpService.dump(request);
 
-        return this.reverseProxyService.forwardRequest(request)
-                .doOnNext(this.dataDumpService::dump);
+        var config = Gl4diusApplication.getCurrentSession()
+                .orElseThrow(() -> new IllegalStateException("Current session not set"))
+                .getConfig();
+
+        if (config instanceof SniffingSessionConfig(boolean sslStripping)) {
+            return this.reverseProxyService.forwardRequest(request, sslStripping)
+                    .doOnNext(this.dataDumpService::dump);
+        }
+
+        return Mono.empty();
     }
 }

