@@ -9,8 +9,11 @@ import io.gl4dius.cli.model.dto.sessionconfig.DefacingSessionConfig;
 import io.gl4dius.cli.model.dto.sessionconfig.PhishingSessionConfig;
 import io.gl4dius.cli.model.entity.Session;
 import io.gl4dius.cli.module.arp.ArpPoisoner;
-import io.gl4dius.cli.module.firewall.IptablesRuleManager;
+import io.gl4dius.cli.module.firewall.IptablesForwardManager;
+import io.gl4dius.cli.module.firewall.IptablesPostRoutingManager;
+import io.gl4dius.cli.module.firewall.IptablesPreRoutingManager;
 import io.gl4dius.cli.module.ipforwarding.Ipv4ForwardingManager;
+import io.gl4dius.cli.module.stealth.NetworkStealthManager;
 import io.gl4dius.cli.repository.PreferencesRepository;
 import io.gl4dius.cli.repository.SessionRepository;
 import io.gl4dius.cli.service.DaemonModuleExecutor;
@@ -27,8 +30,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
-import static io.gl4dius.cli.assets.InterceptionMode.DEFACING;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -37,12 +38,15 @@ public class SessionExecutionService {
     private final DaemonModuleExecutor daemonModuleExecutor;
     private final SessionRepository sessionRepository;
     private final Ipv4ForwardingManager ipv4ForwardingManager;
-    private final IptablesRuleManager iptablesRuleManager;
+    private final IptablesPostRoutingManager iptablesPostRoutingManager;
+    private final IptablesPreRoutingManager iptablesPreRoutingManager;
+    private final IptablesForwardManager iptablesForwardManager;
     private final ArpPoisoner arpPoisoner;
     private final PreferencesRepository preferencesRepository;
     private final ProxyServerEngine proxyServerEngine;
     private final WebServerEngine webServerEngine;
     private final NetDiscoveryService netDiscoveryService;
+    private final NetworkStealthManager networkStealthManager;
 
     public void switchSession(String identifier) {
         var session = UuidUtil.parseUuidIfValid(identifier)
@@ -103,25 +107,18 @@ public class SessionExecutionService {
                 .build();
         this.proxyServerEngine.start(proxyServerRuntimeConfig);
 
-        this.ipv4ForwardingManager.enableIpv4Forwarding();
-        this.iptablesRuleManager.addPostRoutingRule(nicName);
-        this.iptablesRuleManager.addForwardRule(nicName, nicName);
+        this.networkStealthManager.activateStealthMode();
 
-        this.iptablesRuleManager.addRedirectRule(IptablesRedirectRule.builder()
+        this.ipv4ForwardingManager.enableIpv4Forwarding();
+        this.iptablesPostRoutingManager.enableMasquerade(nicName);
+        this.iptablesForwardManager.addForwardRule(nicName, nicName);
+
+        this.iptablesPreRoutingManager.addRedirectRule(IptablesRedirectRule.builder()
                 .inputInterface(nicName)
                 .originalPort(80)
                 .destinationIp(interfaceIP.getHostAddress())
                 .destinationPort(Integer.parseInt(proxyPort))
                 .build());
-
-        if (sessionConfig.mode() == DEFACING) {
-            this.iptablesRuleManager.addRedirectRule(IptablesRedirectRule.builder()
-                    .inputInterface(nicName)
-                    .originalPort(443)
-                    .destinationIp(interfaceIP.getHostAddress())
-                    .destinationPort(Integer.parseInt(proxyPort))
-                    .build());
-        }
 
         if (gatewayIp == null || gatewayIp.isBlank()) {
             gatewayIp = this.netDiscoveryService.findDefaultGateway(nicName)
@@ -150,8 +147,11 @@ public class SessionExecutionService {
     public void stopSession(@NonNull Session session) {
         log.debug("Stopping session {}", session.getId());
         this.daemonModuleExecutor.stop(session.getId());
-        this.iptablesRuleManager.flushRules();
+        this.iptablesPreRoutingManager.flushRules();
+        this.iptablesForwardManager.flushRules();
+        this.iptablesPostRoutingManager.flushRules();
         this.proxyServerEngine.stop();
         this.webServerEngine.stop();
+        this.networkStealthManager.deactivateStealthMode();
     }
 }

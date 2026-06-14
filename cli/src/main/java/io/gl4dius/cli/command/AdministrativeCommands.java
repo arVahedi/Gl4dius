@@ -2,6 +2,7 @@ package io.gl4dius.cli.command;
 
 import io.gl4dius.cli.module.firewall.IptablesRuleManager;
 import io.gl4dius.cli.module.ipforwarding.Ipv4ForwardingManager;
+import io.gl4dius.cli.module.stealth.NetworkStealthManager;
 import io.gl4dius.cli.service.PreferencesService;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,8 @@ import org.springframework.shell.core.command.annotation.Command;
 import org.springframework.shell.core.command.annotation.CommandGroup;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -18,8 +21,9 @@ import org.springframework.stereotype.Component;
 public class AdministrativeCommands {
 
     private final PreferencesService preferencesService;
-    private final IptablesRuleManager iptablesRuleManager;
+    private final List<IptablesRuleManager> iptablesRuleManagers;
     private final Ipv4ForwardingManager ipv4ForwardingManager;
+    private final NetworkStealthManager networkStealthManager;
 
     @Command(name = "config set", description = "Set global configuration")
     public void updatePreferences(
@@ -40,7 +44,8 @@ public class AdministrativeCommands {
 
     @Command(name = "cleanup", description = "Cleanup leftover system changes")
     public void cleanup() {
-        this.iptablesRuleManager.purge();
+        this.iptablesRuleManagers.forEach(IptablesRuleManager::purge);
         this.ipv4ForwardingManager.disableIpv4Forwarding();
+        this.networkStealthManager.deactivateStealthMode();
     }
 }
