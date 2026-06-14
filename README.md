@@ -1,5 +1,7 @@
 # Gl4dius 
 #### (Powered by Gl4di4tor)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/arVahedi/Gl4dius)
+
 A very powerful tool for All kinds of MITM attacks.
 
 ![Alt Gl4dius](./icon.png)
