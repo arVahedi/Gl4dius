@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="icon.png" alt="Gl4dius icon" width="96">
+</p>
+
 <h1 align="center">Gl4dius</h1>
 
 <p align="center">
